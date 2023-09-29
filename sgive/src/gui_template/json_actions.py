@@ -2,7 +2,7 @@ import json
 import os
 
 
-def json_write():
+def _jsonWrite():
     # path to .json conf
     path_to_json = os.path.join(os.path.expanduser('~'), '.config/seniorOS-JSON')
     # if there is no user, leave
@@ -15,11 +15,10 @@ def json_write():
 
     dictionary = {
         'buttons_info': {
-            "num_on_frame": "4",
-            "num_of_buttons": "16",
-            "num_of_menu_buttons": "3",
+            "num_of_frame": "4",
+            "num_menu_back_buttons": "5",
             "num_of_opt_buttons": "12",
-            "num_of_back_back": "1"
+            "num_of_opt_on_frame": "4"
         },
         'frame_info': {
             "master_frame_width": "X",
@@ -36,8 +35,8 @@ def json_write():
         'colors_info': {
             "menu_frame": "#e5e5e5",
             "app_frame": "#FFFFFF",
-            "buttons_unselected": "",
-            "buttons_selected": "",
+            "buttons_unselected": "#e5e5e5",
+            "buttons_selected": "#00ff00",
         },
         'font_info': {
             "screenResolution": "68",
@@ -50,6 +49,18 @@ def json_write():
     with open(f"{path_to_json}/config.json", "w+") as outfile:
         outfile.write(json_object)
 
+def jsonRed(key: str,value: str):
+    path_to_json = os.path.join(os.path.expanduser('~'), '.config/seniorOS-JSON')
+    # if there is no user, leave
+    if os.path.expanduser('~') is None:
+        print("Where is your home mate?")
+        return
+    with open(os.path.join(path_to_json, 'config.json'), "r") as file:
+        jsonData = json.load(file)
+    return jsonData[key][value]
+
 
 if __name__ == '__main__':
-    json_write()
+    _jsonWrite()
+    value = jsonRed('buttons_info', "num_of_frame")
+    print(value)
