@@ -1,0 +1,6 @@
+backup/
+.venv/
+venv/
+.idea/
+idea/
+src/__pychache__.py
