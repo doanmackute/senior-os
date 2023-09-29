@@ -15,10 +15,10 @@ def _jsonWrite():
 
     dictionary = {
         'buttons_info': {
-            "num_of_frame": "4",
-            "num_menu_back_buttons": "5",
-            "num_of_opt_buttons": "12",
-            "num_of_opt_on_frame": "4"
+            "num_of_frame": 4,
+            "num_menu_back_buttons": 5,
+            "num_of_opt_buttons": 12,
+            "num_of_opt_on_frame": 4
         },
         'frame_info': {
             "master_frame_width": "X",
@@ -39,10 +39,11 @@ def _jsonWrite():
             "buttons_selected": "#00ff00",
         },
         'font_info': {
-            "screenResolution": "68",
+            "family": "Halvetica",
+            "size": "36",
         },
         'resolution_info': {
-            "frame_divisor": 5,
+            "factor": 4.5,
         }
     }
     json_object = json.dumps(dictionary, indent=4)
