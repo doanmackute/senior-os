@@ -57,36 +57,31 @@ class Buttons_menu_bar:
         self.option = [1, 2, 3, 4]
         self.value = 0
         self.fontSize = font.Font(family='Halvetica', size=36, weight=font.BOLD)
-
+        bg = '#e5e5e5'
+        bg_active = '#00ff00'
+        self.test_value = 1
         # this isn't final version :)
+        def menu_act_up():
+            if not self.test_value >= len(self.option)-1:
+                self.button_dict[self.test_value].pack_forget()
+                self.button_dict[self.test_value + 1].pack()
+                self.test_value += 1
+
+        def menu_act_down():
+            print("placeholder")
+            if not self.test_value == 1:
+                self.button_dict[self.test_value].pack_forget()
+                self.button_dict[self.test_value - 1].pack()
+                self.test_value -= 1
+
         def menu_back_buttons():
-            def menu_action_up(text):  # pohyb z menu_x na menu_x+1
-                if not text >= 3:  # hradlo, aby to nezmizelo
-                    self.button_dict[text].pack_forget()
-                    self.button_dict[text + 1].pack()
-
             for i in self.option:
-                def func(x=i):
-                    self.value = x
-                    return menu_action_up(x)
-
-                def menu_action_back():  # vraci menu_x na menu_x-1
-                    if self.value == 3:
-                        self.button_dict[self.value].pack_forget()
-                        self.button_dict[self.value - 1].pack()
-                        self.value = self.value - 2
-                    elif self.value == 0:
-                        return
-                    else:
-                        self.button_dict[self.value + 1].pack_forget()
-                        self.button_dict[self.value].pack()
-                        self.value = self.value - 1
-
                 if (i == 4): #BACK BUTTON conf
-                    self.button_dict[i] = Button(self.exit_bar, text=f"BACK#{i}", command=menu_action_back)
+                    self.button_dict[i] = Button(self.exit_bar, text=f"BACK",command= lambda : menu_act_down())
                 else: # MENU BUTTONS conf
-                    self.button_dict[i] = Button(self.menu_bar, text=f"MENU#{i}", command=func)
-                self.button_dict[i]['activebackground'] = '#00ff00'
+                    self.button_dict[i] = Button(self.menu_bar, text=f"MENU#{i}",command= lambda : menu_act_up())
+                self.button_dict[i]['activebackground'] = bg_active
+                self.button_dict[i]['bg'] = bg
                 self.button_dict[i]['width'] = sixWidth
                 self.button_dict[i]['height'] = sixHeight
                 self.button_dict[i]['font'] = self.fontSize
