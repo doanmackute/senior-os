@@ -1,7 +1,10 @@
+"""
+Written by: RYUseless
+"""
 import tkinter
 from tkinter import *
 from tkinter import font
-import json_actions as JS
+import configActions as JS
 
 
 def resolutionMath(root: tkinter.Tk):
@@ -63,7 +66,7 @@ class MenuFrameCreateButtons:
         self.createMenuAndBackButtons()     # def call
 
     def createOptArr(self):  # this reads values from conf.json and creates array based of length that was given
-        _numberOfValues = JS.jsonRed('buttons_info', "num_menu_back_buttons")
+        _numberOfValues = JS.jsonRed('buttons_info', "num_of_act_buttons")
         _counter = 1
         while _counter <= _numberOfValues:
             self.option.append(_counter)
@@ -110,7 +113,7 @@ class MenuFrameCreateButtons:
 
 class Application_frame_temp:
     def __init__(self, root: tkinter.Tk):
-        bg_color = '#FFFFFF'
+        bg_color = JS.jsonRed('colors_info', "app_frame")
         self.root = root
         self.app_frame_width = resolutionMath(root)[3]
         self.app_frame_height = resolutionMath(root)[4]
