@@ -6,16 +6,7 @@ import configActions as act
 
 if __name__ == '__main__':
     root = Tk()
-    value = temp.App(root)
-    print("value jest:",value.menuFrameTempVal)
-
+    temp.App(root)
+    temp.Application_frame_temp(root)
     root.mainloop()
-    """
-    confCheck = act.configExistCheck()
-    if confCheck:
-        root = Tk()
-        temp.App(root)
 
-
-
-    """

@@ -25,10 +25,19 @@ def resolutionMath(root: tkinter.Tk):
     app_width = _screenWidth - fifth_width
     app_height = _screenHeight - fifth_height
     return [screen_res, fifth_width, fifth_height, app_width, app_height]
+def executeCommandFromOPTButton(x: object): # call def for opt1 commands
+    if x == 1:
+        print(f"id tlacitka jest:{x}")
+    elif x == 2:
+        print(f"id tlacitka jest:{x}")
+    elif x == 3:
+        print(f"id tlacitka jest:{x}")
+    elif x == 4:
+        print(f"id tlacitka jest:{x}")
 
 
 class _MenuFrameTemplate:
-    def __init__(self, root: tkinter.Tk,sixWidth: int, sixHeight: int):
+    def __init__(self, root: tkinter.Tk, sixWidth: int, sixHeight: int):
         self.root = root
         bg_color = '#e5e5e5'
 
@@ -57,7 +66,7 @@ class MenuFrameCreateButtons:
     """Create Menu_Action_Buttons and Back_Action_Button.
     :param text_value: this class creates buttons for menu selection and going back option.
     """
-    def __init__(self, menu_bar: tkinter.Frame, exit_bar: tkinter.Frame,options_bar: tkinter.Frame, sixWidth: int, sixHeight: int):
+    def __init__(self, menu_bar: tkinter.Frame, exit_bar: tkinter.Frame, options_bar: tkinter.Frame, sixWidth: int, sixHeight: int):
         self.sixWidth = sixWidth  # get portion of the screen width
         self.optionsBar = options_bar
         self.sixHeight = sixHeight  # get portion of the screen height
@@ -68,8 +77,8 @@ class MenuFrameCreateButtons:
         self.id_of_menu = 1  # value that keeps track of which ID is in use
         self.createOptArr()  # get number of men. and bac. buttons
         self.createMenuAndBackButtons()  # def call
-        #call for opt. class buttons:
-        self.optButtons = optFrameCreateButtons(optionsBar=options_bar,sixWidth=sixWidth,sixHeight=sixHeight)
+        # call for opt. class buttons:
+        self.optButtons = optFrameCreateButtons(optionsBar=options_bar, sixWidth=sixWidth, sixHeight=sixHeight)
 
     def createOptArr(self):  # this reads values from conf.json and creates array based of length that was given
         _numberOfValues = JS.jsonRed('buttons_info', "num_of_act_buttons")
@@ -93,6 +102,8 @@ class MenuFrameCreateButtons:
         if not self.id_of_menu == 1:
             self.button_dict[self.id_of_menu].pack_forget()
             self.button_dict[self.id_of_menu - 1].pack()
+            if self.id_of_menu == 2:
+                self.optButtons.createOPT1Buttons()  # create back opt1 buttons
             self.id_of_menu -= 1
 
     def createMenuAndBackButtons(self):  # this def creates menu and back action button
@@ -152,8 +163,11 @@ class optFrameCreateButtons:
         _fontSize = getValues[3]
         fontInfo = font.Font(family=_fontFamily, size=_fontSize, weight=font.BOLD)
         # end of collecting values for font and colors
+        # -------------------------------------------
         for i in self.option:
-            self.button_dict[i] = Button(self.optionsBar, text=f'OPT{i}',command= lambda : self.getAway())
+            def execCommand(x=i):  # this def stores current i of each button
+                executeCommandFromOPTButton(x)
+            self.button_dict[i] = Button(self.optionsBar, text=f'OPT#{i}', command=execCommand)
             self.button_dict[i]['activebackground'] = bg_active
             self.button_dict[i]['bg'] = bg
             self.button_dict[i]['font'] = fontInfo
@@ -173,12 +187,10 @@ class Application_frame_temp:
         self.master_frame = Frame(root, height=self.app_frame_height, bg=bg_color)
         self.master_frame.pack_propagate(False)
         self.master_frame.pack(fill=X)
+        self.createExitButton()
 
-    def create_exit_button(self, text_value: str) -> None:
-        """Populate exit buttons.
-        :param text_value: Description of the exit button.
-        """
-        exitButtonPokus = Button(self.master_frame, text=text_value, command=self.root.destroy, bg="white")
+    def createExitButton(self):
+        exitButtonPokus = Button(self.master_frame, text="E X I T ", command=self.root.destroy, bg="white")
         exitButtonPokus['width'] = self.app_frame_width
         exitButtonPokus['height'] = self.app_frame_height
         exitButtonPokus['activebackground'] = 'white'
@@ -190,11 +202,9 @@ class App:
         sixWidth = resolutionMath(root)[1]  # get sixth of the resolution to make frame width
         sixHeight = resolutionMath(root)[2]  # get sixth of the resolution to make frame height
         root.title("SeniorOS interface app")
-        root.attributes('-fullscreen', True) # make app fullscreen
+        root.attributes('-fullscreen', True)  # make app fullscreen
         # calling classes
         menuFrameTemp = _MenuFrameTemplate(root, sixWidth, sixHeight)
-        self.menuFrameTempVal = menuFrameTemp.optionsBar #return class frame value
+        self.menuFrameTempVal = menuFrameTemp.optionsBar  # return class frame value
         menuFrameCreateButtons = MenuFrameCreateButtons(menuFrameTemp.menuBar, menuFrameTemp.backBar, menuFrameTemp.optionsBar, sixWidth, sixHeight)
         self.menuFrameCreateButtonsVal = menuFrameCreateButtons
-
-
