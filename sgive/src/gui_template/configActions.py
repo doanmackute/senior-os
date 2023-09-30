@@ -1,24 +1,30 @@
 import json
 import os
 
-
-def _jsonWrite():
-    # path to .json conf
-    path_to_json = os.path.join(os.path.expanduser('~'), '.config/seniorOS-JSON')
-    # if there is no user, leave
+def configExistCheck():
+    # path to config.json ~/.config/seniorOS-JSON/*
+    pathToJsonConf = os.path.join(os.path.expanduser('~'), '.config/seniorOS-JSON')
+    # this checks, if user even exist
     if os.path.expanduser('~') is None:
         print("Where is your home mate?")
-        return
-    # this creates dir if it doesn't exist
-    if not os.path.exists(path_to_json):
-        os.mkdir(path_to_json)
+        return False
+    # creates the folder if it doesn't exist
+    if not os.path.exists(pathToJsonConf):
+        os.mkdir(pathToJsonConf)
+        _jsonWrite(pathToJsonConf)
+        return True
+    else:
+        return True
 
+def _jsonWrite(pathToJsonConf):
+    # path to .json conf
+    print(f"making sure there is path: {pathToJsonConf}")
     dictionary = {
         'buttons_info': {
-            "num_of_frame": "4",
-            "num_menu_back_buttons": "5",
-            "num_of_opt_buttons": "12",
-            "num_of_opt_on_frame": "4"
+            "num_of_frame": 4,
+            "num_of_act_buttons": 5,
+            "num_of_opt_buttons": 12,
+            "num_of_opt_on_frame": 4
         },
         'frame_info': {
             "master_frame_width": "X",
@@ -39,17 +45,19 @@ def _jsonWrite():
             "buttons_selected": "#00ff00",
         },
         'font_info': {
-            "screenResolution": "68",
+            "family": "Halvetica",
+            "size": "36",
         },
         'resolution_info': {
-            "frame_divisor": 5,
+            "factor": 4.5,
         }
     }
     json_object = json.dumps(dictionary, indent=4)
-    with open(f"{path_to_json}/config.json", "w+") as outfile:
+    with open(f"{pathToJsonConf}/config.json", "w+") as outfile:
         outfile.write(json_object)
 
-def jsonRed(key: str,value: str):
+
+def jsonRed(key: str, value: str):
     path_to_json = os.path.join(os.path.expanduser('~'), '.config/seniorOS-JSON')
     # if there is no user, leave
     if os.path.expanduser('~') is None:
@@ -61,6 +69,6 @@ def jsonRed(key: str,value: str):
 
 
 if __name__ == '__main__':
-    _jsonWrite()
+    check = configExistCheck()
     value = jsonRed('buttons_info', "num_of_frame")
     print(value)
