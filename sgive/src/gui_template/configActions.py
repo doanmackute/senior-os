@@ -48,7 +48,7 @@ def _jsonWrite(pathToJsonConf):
             "buttons_selected": "#00ff00",
         },
         'font_info': {
-            "family": "Halvetica",
+            "family": "Helvetica",
             "size": "36",
         },
         'resolution_info': {
@@ -74,6 +74,7 @@ def jsonRed(key, value):
 if __name__ == '__main__':
     idkValue = configExistCheck()
     if idkValue[0]:
+        print("sex")
         _jsonWrite(idkValue[1])
 
     check = configExistCheck()
