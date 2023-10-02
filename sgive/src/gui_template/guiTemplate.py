@@ -88,7 +88,7 @@ class MenuFrameCreateButtons:
         self.optButtons = optFrameCreateButtons(optionsBar=options_bar, sixWidth=sixWidth, sixHeight=sixHeight)
 
     def createOptArr(self):  # this reads values from conf.json and creates array based of length that was given
-        _numberOfValues = JS.jsonRed('buttons_info', "num_of_act_buttons")
+        _numberOfValues = JS.jsonRed('buttons_info', "num_of_act_buttons")  # get values from conf.json
         _counter = 1
         while _counter <= _numberOfValues:
             self.option.append(_counter)
@@ -118,8 +118,8 @@ class MenuFrameCreateButtons:
         getValues = getButtonConf()
         bg = getValues[0]
         bg_active = getValues[1]
-        _fontFamily = getValues[2]
-        _fontSize = getValues[3]
+        _fontFamily = getValues[2]  # get font family
+        _fontSize = getValues[3]  # get font size
         fontInfo = font.Font(family=_fontFamily, size=_fontSize, weight=font.BOLD)
         # end of collecting values for font and colors
         for i in self.option:
