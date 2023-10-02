@@ -1,20 +1,23 @@
 import json
 import os
 
+
 def configExistCheck():
     # path to config.json ~/.config/seniorOS-JSON/*
     pathToJsonConf = os.path.join(os.path.expanduser('~'), '.config/seniorOS-JSON')
     # this checks, if user even exist
     if os.path.expanduser('~') is None:
         print("Where is your home mate?")
-        return False
+        return False, None
     # creates the folder if it doesn't exist
     if not os.path.exists(pathToJsonConf):
         os.mkdir(pathToJsonConf)
         _jsonWrite(pathToJsonConf)
-        return True
+        return True, pathToJsonConf
     else:
-        return True
+        _jsonWrite(pathToJsonConf)  # making sure there is no old version of the conf.json
+        return True, pathToJsonConf
+
 
 def _jsonWrite(pathToJsonConf):
     # path to .json conf
@@ -57,7 +60,7 @@ def _jsonWrite(pathToJsonConf):
         outfile.write(json_object)
 
 
-def jsonRed(key: str, value: str):
+def jsonRed(key, value):
     path_to_json = os.path.join(os.path.expanduser('~'), '.config/seniorOS-JSON')
     # if there is no user, leave
     if os.path.expanduser('~') is None:
@@ -69,6 +72,8 @@ def jsonRed(key: str, value: str):
 
 
 if __name__ == '__main__':
+    idkValue = configExistCheck()
+    if idkValue[0]:
+        _jsonWrite(idkValue[1])
+
     check = configExistCheck()
-    value = jsonRed('buttons_info', "num_of_frame")
-    print(value)

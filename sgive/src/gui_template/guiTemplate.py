@@ -6,6 +6,7 @@ from tkinter import *
 from tkinter import font
 import configActions as JS
 
+
 def getButtonConf():
     # collecting values for font and colors
     bg = JS.jsonRed('colors_info', "buttons_unselected")
@@ -14,6 +15,7 @@ def getButtonConf():
     fontSize = JS.jsonRed('font_info', "size")
     # end of collecting values for font and colors
     return bg, bg_active, fontFamily, fontSize
+
 
 def resolutionMath(root: tkinter.Tk):
     _screenWidth = root.winfo_screenwidth()
@@ -25,7 +27,9 @@ def resolutionMath(root: tkinter.Tk):
     app_width = _screenWidth - fifth_width
     app_height = _screenHeight - fifth_height
     return [screen_res, fifth_width, fifth_height, app_width, app_height]
-def executeCommandFromOPTButton(x: object): # call def for opt1 commands
+
+
+def executeCommandFromOPTButton(x: object):  # call def for opt1 commands
     if x == 1:
         print(f"id tlacitka jest:{x}")
     elif x == 2:
@@ -62,11 +66,14 @@ class _MenuFrameTemplate:
         self.optionsBar.pack_propagate(False)
         self.optionsBar.pack(expand=True, fill=BOTH)
 
+
 class MenuFrameCreateButtons:
     """Create Menu_Action_Buttons and Back_Action_Button.
     :param text_value: this class creates buttons for menu selection and going back option.
     """
-    def __init__(self, menu_bar: tkinter.Frame, exit_bar: tkinter.Frame, options_bar: tkinter.Frame, sixWidth: int, sixHeight: int):
+
+    def __init__(self, menu_bar: tkinter.Frame, exit_bar: tkinter.Frame, options_bar: tkinter.Frame, sixWidth: int,
+                 sixHeight: int):
         self.sixWidth = sixWidth  # get portion of the screen width
         self.optionsBar = options_bar
         self.sixHeight = sixHeight  # get portion of the screen height
@@ -167,6 +174,7 @@ class optFrameCreateButtons:
         for i in self.option:
             def execCommand(x=i):  # this def stores current i of each button
                 executeCommandFromOPTButton(x)
+
             self.button_dict[i] = Button(self.optionsBar, text=f'OPT#{i}', command=execCommand)
             self.button_dict[i]['activebackground'] = bg_active
             self.button_dict[i]['bg'] = bg
@@ -206,5 +214,6 @@ class App:
         # calling classes
         menuFrameTemp = _MenuFrameTemplate(root, sixWidth, sixHeight)
         self.menuFrameTempVal = menuFrameTemp.optionsBar  # return class frame value
-        menuFrameCreateButtons = MenuFrameCreateButtons(menuFrameTemp.menuBar, menuFrameTemp.backBar, menuFrameTemp.optionsBar, sixWidth, sixHeight)
+        menuFrameCreateButtons = MenuFrameCreateButtons(menuFrameTemp.menuBar, menuFrameTemp.backBar,
+                                                        menuFrameTemp.optionsBar, sixWidth, sixHeight)
         self.menuFrameCreateButtonsVal = menuFrameCreateButtons
