@@ -8,7 +8,7 @@ if __name__ == '__main__':
     if isExist[0]:
         root = Tk()
         temp.App(root)
-        temp.Application_frame_temp(root)
+        temp.ApplicationFrameTemplate(root)
         root.mainloop()
     else:
         print("there is no conf.json present in the system")

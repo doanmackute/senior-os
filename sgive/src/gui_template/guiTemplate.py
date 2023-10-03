@@ -36,6 +36,14 @@ def executeCommandFromOPTButton(x: object):  # call def for opt1 commands
         print(f"id tlacitka jest:{x}")
     elif x == 4:
         print(f"id tlacitka jest:{x}")
+    elif x == 5:
+        print(f"id tlacitka jest:{x}")
+    elif x == 6:
+        print(f"id tlacitka jest:{x}")
+    elif x == 7:
+        print(f"id tlacitka jest:{x}")
+    elif x == 8:
+        print(f"id tlacitka jest:{x}")
 
 
 class _MenuFrameTemplate:
@@ -45,6 +53,7 @@ class _MenuFrameTemplate:
     │ menuFrame │               optionsFrame                                    │
     └───────────────────────────────────────────────────────────────────────────┘
     """
+
     def __init__(self, root: tkinter.Tk, sixWidth: int, sixHeight: int):
         self.root = root
         bg_color = '#e5e5e5'
@@ -66,23 +75,57 @@ class _MenuFrameTemplate:
         self.optionsFrame.pack(expand=True, fill=BOTH)
 
 
+class ApplicationFrameTemplate:
+    def __init__(self, root: tkinter.Tk):
+        self.exitButtonPokus = None
+        bg_color = JS.jsonRed('colors_info', "app_frame")
+        self.root = root
+        self.app_frame_width = resolutionMath(root)[3]
+        self.app_frame_height = resolutionMath(root)[4]
+        self.master_frame = Frame(root, height=self.app_frame_height, bg=bg_color)
+        self.master_frame.pack_propagate(False)
+        self.master_frame.pack(fill=X)
+        self.createExitButton()
+
+    def changeColor(self):
+        self.exitButtonPokus['bg'] = "#5A5A5A"
+        self.exitButtonPokus['activebackground'] = "#5A5A5A"
+
+    def createExitButton(self):
+        self.exitButtonPokus = Button(self.master_frame, text="C L I C K  M E ", command=self.changeColor)
+        self.exitButtonPokus['bg'] = "white"
+        self.exitButtonPokus.pack(side=LEFT, expand=True, fill='both')
+    """
+END OF FRAME SECTION
+    
+START OF BUTTONS SECTION
+    """
+
+
 class menuButtonCRT:
     """Create Menu_Action_Buttons and Back_Action_Button.
     :param text_value: this class creates buttons for menu selection and going back option.
     """
+
     def __init__(self, menuBar: tkinter.Frame, optionsBar: tkinter.Frame, panelWidth: int, sixHeight: int):
         self.dummyPixel = PhotoImage(width=1, height=1)
-        self.sixWidth = panelWidth            # ← get portion of the screen width
-        self.optionsBar = optionsBar         # ← tkinter.Frame for options
-        self.sixHeight = sixHeight          # ← get portion of the screen height
-        self.menuBar = menuBar              # ← tkinter.Frame for menu buttons
-        self.button_dict = {}               # ← this thing for creating menu and back buttons
-        self.option = []                    # ← array for specifying 'IDs' for buttons
-        self.id_of_menu = 1                 # ← value that keeps track of which ID is in use
-        self.createOptArr()                 # ← get number of men. and bac. buttons
-        self.createMenuAndBackButtons()     # ← def call
+        self.sixWidth = panelWidth  # ← get portion of the screen width
+        self.optionsBar = optionsBar  # ← tkinter.Frame for options
+        self.sixHeight = sixHeight  # ← get portion of the screen height
+        self.menuBar = menuBar  # ← tkinter.Frame for menu buttons
+        self.button_dict = {}  # ← this thing for creating menu and back buttons
+        self.option = []  # ← array for specifying 'IDs' for buttons
+        self.id_of_menu = 1  # ← value that keeps track of which ID is in use
+        self.createOptArr()  # ← get number of men. and bac. buttons
+        self.createButtons()  # ← def call
+        self.dummyPixel = PhotoImage(width=1, height=1)
         # call for opt. class buttons:
-        self.optButtons = optionsButtonsCRT(optionsBar=optionsBar, panelWidth=panelWidth, sixHeight=sixHeight)
+        self.optButtons1 = optionsButtonsCRT1(optionsBar=optionsBar, panelWidth=panelWidth, panelHeight=sixHeight)
+        self.optButtons2 = optionsButtonsCRT2(optionsBar=optionsBar, panelWidth=panelWidth, panelHeight=sixHeight)
+        """
+        TODO: možná by šlo zavolat self.optButtons1, ale pouze změnit finální x=i o +4 tak, aby pak def co si rozlišuje commandy věděl x
+        tím by se ušetřila identická kopie třídy + exit tlačítko :)
+        """
 
     def createOptArr(self):  # this reads values from conf.json and creates array based of length that was given
         _numberOfValues = JS.jsonRed('buttons_info', "num_of_menu_buttons")  # get values from conf.json
@@ -93,10 +136,17 @@ class menuButtonCRT:
 
     def menuActionUp(self):  # this def goes up one menu button: menu_X -> menu_X+1
         if self.id_of_menu == 1:
-            new_dict = self.optButtons.button_dict
+            new_dict = self.optButtons1.button_dict
             for i in new_dict:
                 new_dict[i].pack_forget()
+        """
+        if the number of the menu is lower than the lenght of self.option, it goes one button up and shows optButtons for that menu
+        if the number of menuButton is equal to the lenght, it does a loop and goes back to menu1 with its optButtons
+        """
         if self.id_of_menu < len(self.option):
+            new_dict2 = self.optButtons2.button_dict
+            for i in new_dict2:
+                new_dict2[i].pack(side=LEFT, padx=5)
             self.button_dict[self.id_of_menu].pack_forget()
             self.button_dict[self.id_of_menu + 1].pack(side=LEFT, expand=True, fill='both')
             self.id_of_menu += 1
@@ -104,11 +154,15 @@ class menuButtonCRT:
             self.button_dict[self.id_of_menu].pack_forget()
             self.id_of_menu = 1
             self.button_dict[self.id_of_menu].pack(side=LEFT, expand=True, fill='both')
-            new_dict = self.optButtons.button_dict  # show again the first opt buttons
+            # opt buttons actions:
+            new_dict2 = self.optButtons2.button_dict  # hide secondary opt
+            for i in new_dict2:
+                new_dict2[i].pack_forget()
+            new_dict = self.optButtons1.button_dict  # show again the first opt buttons
             for i in new_dict:
-                new_dict[i].pack(side=LEFT, padx=10)
+                new_dict[i].pack(side=LEFT, padx=5)
 
-    def createMenuAndBackButtons(self):  # this def creates menu and back action button
+    def createButtons(self):  # this def creates menu and back action button
         # collecting values for font and colors from def
         getValues = getButtonConf()
         bg = getValues[0]
@@ -125,14 +179,14 @@ class menuButtonCRT:
         self.button_dict[1].pack(side=LEFT, expand=True, fill='both')  # FIRST MENU
 
 
-class optionsButtonsCRT:
-    def __init__(self, optionsBar: tkinter.Frame, panelWidth: int, sixHeight: int):
+class optionsButtonsCRT1:
+    def __init__(self, optionsBar: tkinter.Frame, panelWidth: int, panelHeight: int):
         self.dummyPixel = PhotoImage(width=1, height=1)
         self.optionsBar = optionsBar
         self.button_dict = {}  # this thing for creating menu and back buttons
         self.option = []  # array for specifying 'IDs' for buttons
         self.sixWidth = panelWidth  # get portion of the screen width
-        self.sixHeight = sixHeight  # get portion of the screen height
+        self.sixHeight = panelHeight  # get portion of the screen height
         self.createOptArr()
         self.createOPT1Buttons()
 
@@ -153,8 +207,10 @@ class optionsButtonsCRT:
         for i in self.option:
             def execCommand(x=i):  # this def stores current i of each button
                 executeCommandFromOPTButton(x)
+
             # button config:
-            self.button_dict[i] = Button(self.optionsBar, text=f'OPTIONAL {i}', image=self.dummyPixel, compound="c", command=execCommand)
+            self.button_dict[i] = Button(self.optionsBar, text=f'OPT#{i}', image=self.dummyPixel, compound="c",
+                                         command=execCommand)
             self.button_dict[i]['activebackground'] = bg_active
             self.button_dict[i]['width'] = self.sixWidth - 40
             self.button_dict[i]['bg'] = bg
@@ -167,26 +223,52 @@ class optionsButtonsCRT:
             self.button_dict[i].pack(side=LEFT, padx=5)
 
 
+class optionsButtonsCRT2:
+    def __init__(self, optionsBar: tkinter.Frame, panelWidth: int, panelHeight: int):
+        self.dummyPixel = PhotoImage(width=1, height=1)
+        self.optionsBar = optionsBar
+        self.button_dict = {}  # this thing for creating menu and back buttons
+        self.option = []  # array for specifying 'IDs' for buttons
+        self.sixWidth = panelWidth  # get portion of the screen width
+        self.sixHeight = panelHeight  # get portion of the screen height
+        self.createOptArr()
+        self.createOPT2Buttons()
 
-class Application_frame_temp:
-    def __init__(self, root: tkinter.Tk):
-        bg_color = JS.jsonRed('colors_info', "app_frame")
-        self.root = root
-        self.app_frame_width = resolutionMath(root)[3]
-        self.app_frame_height = resolutionMath(root)[4]
-        self.master_frame = Frame(root, height=self.app_frame_height, bg=bg_color)
-        self.master_frame.pack_propagate(False)
-        self.master_frame.pack(fill=X)
-        self.createExitButton()
+    def createOptArr(self):  # this reads values from conf.json and creates array based of length that was given
+        _numberOfValues = JS.jsonRed('buttons_info', "num_of_opt_on_frame")
+        _counter = 1
+        while _counter <= _numberOfValues:
+            self.option.append(_counter)
+            _counter += 1
 
-    def createExitButton(self):
-        exitButtonPokus = Button(self.master_frame, text="E X I T ", command=self.root.destroy, bg="white")
-        exitButtonPokus['width'] = self.app_frame_width
-        exitButtonPokus['height'] = self.app_frame_height
-        exitButtonPokus['activebackground'] = 'white'
-        exitButtonPokus.pack()
+    def createOPT2Buttons(self):
+        # collecting values for font and colors from def
+        getValues = getButtonConf()
+        bg = getValues[0]
+        bg_active = getValues[1]
+        # end of collecting values for font and colors
+        # -------------------------------------------
+        for i in self.option:
+            def execCommand(x=i):  # this def stores current i of each button
+                x = x+4
+                executeCommandFromOPTButton(x)
+            if i == len(self.option):
+                self.button_dict[i] = Button(self.optionsBar, text='EXIT', image=self.dummyPixel, compound="c",
+                                             command=exit)  # exit == exit(0)
+            else:
+                self.button_dict[i] = Button(self.optionsBar, text=f'OPT#{i + 4}', image=self.dummyPixel, compound="c",
+                                             command=execCommand)
+            # button config:
+            self.button_dict[i]['activebackground'] = bg_active
+            self.button_dict[i]['width'] = self.sixWidth - 40
+            self.button_dict[i]['bg'] = bg
+            self.button_dict[i]['font'] = JS.jsonRed('font_info', "font")
+            self.button_dict[i]['height'] = self.sixHeight
+            self.button_dict[i]['borderwidth'] = 2
+            self.button_dict[i]['relief'] = 'solid'
 
 
+# this class creates root windows and calls needed classes
 class App:
     def __init__(self, root: tkinter.Tk):
         sixWidth = resolutionMath(root)[1]  # get sixth of the resolution to make frame width
