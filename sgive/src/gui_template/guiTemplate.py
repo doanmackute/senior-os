@@ -121,8 +121,10 @@ class MenuFrameCreateButtons:
             self.button_dict[i]['relief'] = 'solid'
         self.button_dict[1].pack(side=LEFT, expand=True, fill='both')  # FIRST MENU
 
+
 class optFrameCreateButtons:
     def __init__(self, optionsBar: tkinter.Frame, panelWidth: int, sixHeight: int):
+        self.dummyPixel = PhotoImage(width=1, height=1)
         self.optionsBar = optionsBar
         self.button_dict = {}  # this thing for creating menu and back buttons
         self.option = []  # array for specifying 'IDs' for buttons
@@ -143,23 +145,24 @@ class optFrameCreateButtons:
         getValues = getButtonConf()
         bg = getValues[0]
         bg_active = getValues[1]
-        pixel = PhotoImage(width=1, height=1)
         # end of collecting values for font and colors
         # -------------------------------------------
         for i in self.option:
             def execCommand(x=i):  # this def stores current i of each button
                 executeCommandFromOPTButton(x)
             # button config:
-            self.button_dict[i] = Button(self.optionsBar, text=f'OPT#{i}', command=execCommand)
+            self.button_dict[i] = Button(self.optionsBar, text=f'OPT#{i}', image=self.dummyPixel, compound="c", command=execCommand)
             self.button_dict[i]['activebackground'] = bg_active
-            self.button_dict[i]['width'] = int(self.sixWidth/64) + 1
+            self.button_dict[i]['width'] = self.sixWidth - 40
             self.button_dict[i]['bg'] = bg
             self.button_dict[i]['font'] = JS.jsonRed('font_info', "font")
             self.button_dict[i]['height'] = self.sixHeight
             self.button_dict[i]['borderwidth'] = 2
             self.button_dict[i]['relief'] = 'solid'
+
             # show buttons:
-            self.button_dict[i].pack(side=LEFT, padx=10)
+            self.button_dict[i].pack(side=LEFT, padx=5)
+
 
 
 class Application_frame_temp:
