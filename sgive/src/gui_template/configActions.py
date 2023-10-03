@@ -25,21 +25,9 @@ def _jsonWrite(pathToJsonConf):
     dictionary = {
         'buttons_info': {
             "num_of_frame": 4,
-            "num_of_act_buttons": 5,
+            "num_of_menu_buttons": 2,
             "num_of_opt_buttons": 12,
             "num_of_opt_on_frame": 4
-        },
-        'frame_info': {
-            "master_frame_width": "X",
-            "master_frame_height": "X",
-            "sub_options_frame_width": "X",
-            "sub_options_frame_height": "X",
-            "sub_menu_frame_width": "X",
-            "sub_menu_frame_height": "X",
-            "sub_back_frame_width": "X",
-            "sub_back_frame_height": "X",
-            "application_frame_width": "X",
-            "application_frame_height": "X",
         },
         'colors_info': {
             "menu_frame": "#e5e5e5",
@@ -48,11 +36,11 @@ def _jsonWrite(pathToJsonConf):
             "buttons_selected": "#00ff00",
         },
         'font_info': {
-            "family": "Helvetica",
-            "size": "36",
+            "font": "Helvetica 36 bold",
         },
         'resolution_info': {
-            "factor": 4.5,
+            "height_divisor": 4.5,
+            "width_divisor": 5,
         }
     }
     json_object = json.dumps(dictionary, indent=4)
