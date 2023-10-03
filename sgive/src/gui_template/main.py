@@ -1,4 +1,3 @@
-from pprint import pprint
 from tkinter import *
 import guiTemplate as temp
 import configActions as act
