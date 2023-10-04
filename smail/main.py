@@ -5,6 +5,8 @@ from email.mime.text import MIMEText
 import imaplib
 import email
 import json
+from sgive.src.gui_template import configActions
+from sgive.src.gui_template import guiTemplate
 
 class defaultFrame(ttk.Frame):
     def __init__(self, parent):
@@ -183,7 +185,14 @@ class readMailFrame(ttk.Frame):
                 for part in email_message.walk():
                     if part.get_content_type() == "text/plain" or part.get_content_type() == "text/html":
                         message = part.get_payload(decode=True)
-                        email_content = "Subject: "+ email_message["subject"] + "\nFrom: " + email_message["from"] + "\nDate: " + email_message["date"] + "\nMessage:\n" + message.decode()
+
+                        try:
+                            message_deocde = message.decode("utf-8")
+                        except:
+                            message_deocde = message.decode("latino-1")
+
+
+                        email_content = "Subject: "+ email_message["subject"] + "\nFrom: " + email_message["from"] + "\nDate: " + email_message["date"] + "\nMessage:\n" + message_deocde
                         self.emails.append(email_content)
                         break
 
@@ -227,6 +236,8 @@ def main():
     style.configure("my.TLabel", font = (fontName, fontSize, fontWeight))
 
     defFrame = defaultFrame(window)
+    configActions.configExistCheck()
+    guiTemplate.getButtonConf()
 
     window.mainloop()
 
