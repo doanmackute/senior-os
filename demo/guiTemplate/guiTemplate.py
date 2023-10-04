@@ -29,22 +29,21 @@ def resolutionMath(root: tkinter.Tk):
 
 def executeCommandFromOPTButton(x: object):  # call def for opt1 commands
     if x == 1:
-        print(f"id tlacitka jest:{x}")
-
+        print(f"id tlacitka jest:{x} | text je: EXIT")
     elif x == 2:
-        print(f"id tlacitka jest:{x}")
+        print(f"id tlacitka jest:{x} | text je: opt#{x-1}")
     elif x == 3:
-        print(f"id tlacitka jest:{x}")
+        print(f"id tlacitka jest:{x} | text je: opt#{x-1}")
     elif x == 4:
-        print(f"id tlacitka jest:{x}")
+        print(f"id tlacitka jest:{x} | text je: opt#{x-1}")
     elif x == 5:
-        print(f"id tlacitka jest:{x}")
+        print(f"id tlacitka jest:{x} | text je: opt#{x-1}")
     elif x == 6:
-        print(f"id tlacitka jest:{x}")
+        print(f"id tlacitka jest:{x} | text je: opt#{x-1}")
     elif x == 7:
-        print(f"id tlacitka jest:{x}")
+        print(f"id tlacitka jest:{x} | text je: opt#{x-1}")
     elif x == 8:
-        print(f"id tlacitka EXIT je:{x}")
+        print(f"id tlacitka je:{x} | text je: opt#{x-1}")
 
 
 class _MenuFrameTemplate:
@@ -213,9 +212,12 @@ class optionsButtonsCRT1:
             def execCommand(x=i):  # this def stores current i of each button
                 executeCommandFromOPTButton(x)
 
-            # button config:
-            self.button_dict[i] = Button(self.optionsBar, text=f'OPT#{i}', image=self.dummyPixel, compound="c",
-                                         command=execCommand)
+            if i == 1:  # make first button exit button
+                self.button_dict[i] = Button(self.optionsBar, text='EXIT', image=self.dummyPixel, compound="c",
+                                             command=exit)  # exit == exit(0)
+            else:
+                self.button_dict[i] = Button(self.optionsBar, text=f'OPT#{i-1}', image=self.dummyPixel, compound="c",
+                                             command=execCommand)
             self.button_dict[i]['activebackground'] = bg_active
             # 1/x of width - padX value from both sides * num of buttons ↓
             self.button_dict[i]['width'] = int(self.sixWidth - (2*padxValue*numOPT))
@@ -260,12 +262,7 @@ class optionsButtonsCRT2:
             def execCommand(x=i):  # this def stores current i of each button
                 x = x+4
                 executeCommandFromOPTButton(x)
-            if i == len(self.option):
-                self.button_dict[i] = Button(self.optionsBar, text='EXIT', image=self.dummyPixel, compound="c",
-                                             command=exit)  # exit == exit(0)
-            else:
-                self.button_dict[i] = Button(self.optionsBar, text=f'OPT#{i + 4}', image=self.dummyPixel, compound="c",
-                                             command=execCommand)
+            self.button_dict[i] = Button(self.optionsBar, text=f'OPT#{i + 3}', image=self.dummyPixel, compound="c", command=execCommand)
             # button config:
             self.button_dict[i]['activebackground'] = bg_active
             # 1/x of width - padX value from both sides * num of buttons ↓
