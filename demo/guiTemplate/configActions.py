@@ -4,8 +4,9 @@ import os
 def temporaryGetPath():
     currentDir = os.path.dirname(os.path.dirname(__file__))
     parentCurentDir = os.path.abspath(os.path.join(currentDir, os.pardir))
-    supaParent = os.path.abspath(os.path.join(parentCurentDir, os.pardir))
-    confPath = os.path.join(supaParent, "sconf")
+    # (if launched in sgive, it is needed)
+    # supaParent = os.path.abspath(os.path.join(parentCurentDir, os.pardir))
+    confPath = os.path.join(parentCurentDir, "sconf")
     return confPath
 
 
