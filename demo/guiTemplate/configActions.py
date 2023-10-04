@@ -12,11 +12,10 @@ def temporaryGetPath():
 
 
 def configExistCheck(givenVersion):
-    currentVersion = jsonRed('Version',"configVersion")
     pathToJsonConf = temporaryGetPath()
-    print(os.path.isfile(os.path.join(pathToJsonConf,'config.json')))
     if os.path.exists(pathToJsonConf):
         if os.path.isfile(os.path.join(pathToJsonConf,'config.json')):
+            currentVersion = jsonRed('Version', "configVersion")
             if not currentVersion == givenVersion:
                 _jsonWrite(givenVersion)
                 print("LOG: updating conf.json")
@@ -24,7 +23,7 @@ def configExistCheck(givenVersion):
             print("LOG: conf.json is already there, skipping")
             return True
         else:
-            _jsonWrite(currentVersion)
+            _jsonWrite(givenVersion)
             return True
     else:
         print("LOG: there is no path to the configuration file")
@@ -38,7 +37,6 @@ def _jsonWrite(currentVersion):
             "configVersion": currentVersion
         },
         'buttons_info': {
-            "num_of_frame": 4,
             "num_of_menu_buttons": 2,
             "num_of_opt_on_frame": 4,
             "padx_value": 5,
