@@ -45,12 +45,18 @@ def _jsonWrite():
     with open(f"{temporaryGetPath()}/config.json", "w+") as outfile:
         outfile.write(json_object)
 
+
 def jsonRed(key, value):
-    path_to_json = os.path.join(os.path.expanduser('~'), '.config/seniorOS-JSON')
+    path = temporaryGetPath()
     # if there is no user, leave
     if os.path.expanduser('~') is None:
         print("Where is your home mate?")
         return
-    with open(os.path.join(path_to_json, 'config.json'), "r") as file:
-        jsonData = json.load(file)
-    return jsonData[key][value]
+
+    if os.path.exists(path):
+        with open(os.path.join(path, 'config.json'), "r") as file:
+            jsonData = json.load(file)
+        return jsonData[key][value]
+    else:
+        print("LOG: there is no path to the configuration file")
+        return
