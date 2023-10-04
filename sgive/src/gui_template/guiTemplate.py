@@ -4,6 +4,7 @@ Written by: RYUseless
 import tkinter
 from tkinter import *
 import sgive.src.gui_template.configActions as JS
+from screeninfo import get_monitors
 
 
 def getButtonConf():
@@ -14,9 +15,10 @@ def getButtonConf():
     return bg, bg_active
 
 
-def resolutionMath(root: tkinter.Tk):
-    _screenWidth = root.winfo_screenwidth()
-    _screenHeight = root.winfo_screenheight()
+def resolutionMath():
+    # this is from screen_info imported get_monitors to get always the first screen
+    _screenWidth = get_monitors()[0].width
+    _screenHeight = get_monitors()[0].height
     # upper frame (MenuFrame)width and height
     panelWidth = int(_screenWidth / JS.jsonRed('resolution_info', "width_divisor"))
     panelHeight = int(_screenHeight / JS.jsonRed('resolution_info', "height_divisor"))
@@ -80,8 +82,8 @@ class ApplicationFrameTemplate:
         self.exitButtonPokus = None
         bg_color = JS.jsonRed('colors_info', "app_frame")
         self.root = root
-        self.app_frame_width = resolutionMath(root)[3]
-        self.app_frame_height = resolutionMath(root)[4]
+        self.app_frame_width = resolutionMath()[3]
+        self.app_frame_height = resolutionMath()[4]
         self.master_frame = Frame(root, height=self.app_frame_height, bg=bg_color)
         self.master_frame.pack_propagate(False)
         self.master_frame.pack(fill=X)
@@ -279,8 +281,8 @@ class optionsButtonsCRT2:
 # this class creates root windows and calls needed classes
 class App:
     def __init__(self, root: tkinter.Tk):
-        sixWidth = resolutionMath(root)[1]  # get sixth of the resolution to make frame width
-        sixHeight = resolutionMath(root)[2]  # get sixth of the resolution to make frame height
+        sixWidth = resolutionMath()[1]  # get sixth of the resolution to make frame width
+        sixHeight = resolutionMath()[2]  # get sixth of the resolution to make frame height
         root.title("SeniorOS interface app")
         root.attributes('-fullscreen', True)  # make app fullscreen
         # calling classes

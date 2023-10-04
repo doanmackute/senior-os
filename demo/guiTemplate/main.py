@@ -9,7 +9,7 @@ if __name__ == '__main__':
     if isExist:
         root = Tk()
         temp.App(root)
-        AppResolution = temp.resolutionMath(root)
+        AppResolution = temp.resolutionMath()
         print(f"resolution of the app is:{AppResolution[3]}x{AppResolution[4]}")
         root.mainloop()
     else:
