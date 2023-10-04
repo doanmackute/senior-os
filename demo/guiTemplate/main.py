@@ -4,7 +4,8 @@ import demo.guiTemplate.configActions as act
 
 
 if __name__ == '__main__':
-    isExist = act.configExistCheck()
+    _currentVersionOfConfig = 0.1
+    isExist = act.configExistCheck(_currentVersionOfConfig)
     if isExist:
         root = Tk()
         temp.App(root)
