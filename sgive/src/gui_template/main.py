@@ -12,5 +12,4 @@ if __name__ == '__main__':
         root.mainloop()
     else:
         print("there is no conf.json present in the system")
-        exit(0)
-
+        exit(1)
