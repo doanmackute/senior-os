@@ -3,7 +3,7 @@ Written by: RYUseless
 """
 import tkinter
 from tkinter import *
-import sgive.src.gui_template.configActions as JS
+import demo.guiTemplate.configActions as JS
 
 
 def getButtonConf():

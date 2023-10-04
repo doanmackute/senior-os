@@ -1,6 +1,6 @@
 from tkinter import *
 import guiTemplate as temp
-import sgive.src.gui_template.configActions as act
+import demo.guiTemplate.configActions as act
 
 
 if __name__ == '__main__':
