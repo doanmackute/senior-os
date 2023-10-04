@@ -17,10 +17,10 @@ def getButtonConf():
 def resolutionMath(root: tkinter.Tk):
     _screenWidth = root.winfo_screenwidth()
     _screenHeight = root.winfo_screenheight()
-    # spacer
+    # upper frame (MenuFrame)width and height
     panelWidth = int(_screenWidth / JS.jsonRed('resolution_info', "width_divisor"))
     panelHeight = int(_screenHeight / JS.jsonRed('resolution_info', "height_divisor"))
-    # spacer
+    # lower frame (ApplicationFrame) width and height
     app_width = _screenWidth - panelWidth
     app_height = _screenHeight - panelHeight
     # return thing
@@ -30,6 +30,7 @@ def resolutionMath(root: tkinter.Tk):
 def executeCommandFromOPTButton(x: object):  # call def for opt1 commands
     if x == 1:
         print(f"id tlacitka jest:{x}")
+
     elif x == 2:
         print(f"id tlacitka jest:{x}")
     elif x == 3:
@@ -43,7 +44,7 @@ def executeCommandFromOPTButton(x: object):  # call def for opt1 commands
     elif x == 7:
         print(f"id tlacitka jest:{x}")
     elif x == 8:
-        print(f"id tlacitka jest:{x}")
+        print(f"id tlacitka EXIT je:{x}")
 
 
 class _MenuFrameTemplate:
@@ -88,19 +89,19 @@ class ApplicationFrameTemplate:
         self.createExitButton()
 
     def changeColor(self):
-        self.exitButtonPokus['bg'] = "#5A5A5A"
-        self.exitButtonPokus['activebackground'] = "#5A5A5A"
+        self.exitButtonPokus['bg'] = "#301934"
+        self.exitButtonPokus['activebackground'] = "#301934"
 
     def createExitButton(self):
         self.exitButtonPokus = Button(self.master_frame, text="C L I C K  M E ", command=self.changeColor)
         self.exitButtonPokus['bg'] = "white"
         self.exitButtonPokus.pack(side=LEFT, expand=True, fill='both')
+
     """
 END OF FRAME SECTION
     
 START OF BUTTONS SECTION
     """
-
 
 class menuButtonCRT:
     """Create Menu_Action_Buttons and Back_Action_Button.
@@ -140,13 +141,13 @@ class menuButtonCRT:
             for i in new_dict:
                 new_dict[i].pack_forget()
         """
-        if the number of the menu is lower than the lenght of self.option, it goes one button up and shows optButtons for that menu
-        if the number of menuButton is equal to the lenght, it does a loop and goes back to menu1 with its optButtons
+        if the number of the menu is lower than the length of self.option, it goes one button up and shows optButtons for that menu
+        if the number of menuButton is equal to the length, it does a loop and goes back to menu1 with its optButtons
         """
         if self.id_of_menu < len(self.option):
             new_dict2 = self.optButtons2.button_dict
             for i in new_dict2:
-                new_dict2[i].pack(side=LEFT, padx=5)
+                new_dict2[i].pack(side=LEFT, padx=JS.jsonRed('buttons_info', "padx_value"))
             self.button_dict[self.id_of_menu].pack_forget()
             self.button_dict[self.id_of_menu + 1].pack(side=LEFT, expand=True, fill='both')
             self.id_of_menu += 1
@@ -160,7 +161,7 @@ class menuButtonCRT:
                 new_dict2[i].pack_forget()
             new_dict = self.optButtons1.button_dict  # show again the first opt buttons
             for i in new_dict:
-                new_dict[i].pack(side=LEFT, padx=5)
+                new_dict[i].pack(side=LEFT, padx=JS.jsonRed('buttons_info', "padx_value"))
 
     def createButtons(self):  # this def creates menu and back action button
         # collecting values for font and colors from def
@@ -202,6 +203,8 @@ class optionsButtonsCRT1:
         getValues = getButtonConf()
         bg = getValues[0]
         bg_active = getValues[1]
+        numOPT = JS.jsonRed('buttons_info', "num_of_opt_on_frame")
+        padxValue = JS.jsonRed('buttons_info', "padx_value")
         # end of collecting values for font and colors
         # -------------------------------------------
         for i in self.option:
@@ -212,7 +215,8 @@ class optionsButtonsCRT1:
             self.button_dict[i] = Button(self.optionsBar, text=f'OPT#{i}', image=self.dummyPixel, compound="c",
                                          command=execCommand)
             self.button_dict[i]['activebackground'] = bg_active
-            self.button_dict[i]['width'] = self.sixWidth - 40
+            # 1/x of width - padX value from both sides * num of buttons ↓
+            self.button_dict[i]['width'] = int(self.sixWidth - 2*padxValue*numOPT)
             self.button_dict[i]['bg'] = bg
             self.button_dict[i]['font'] = JS.jsonRed('font_info', "font")
             self.button_dict[i]['height'] = self.sixHeight
@@ -220,7 +224,7 @@ class optionsButtonsCRT1:
             self.button_dict[i]['relief'] = 'solid'
 
             # show buttons:
-            self.button_dict[i].pack(side=LEFT, padx=5)
+            self.button_dict[i].pack(side=LEFT, padx=padxValue)
 
 
 class optionsButtonsCRT2:
@@ -246,6 +250,8 @@ class optionsButtonsCRT2:
         getValues = getButtonConf()
         bg = getValues[0]
         bg_active = getValues[1]
+        numOPT = JS.jsonRed('buttons_info', "num_of_opt_on_frame")
+        padxValue = JS.jsonRed('buttons_info', "padx_value")
         # end of collecting values for font and colors
         # -------------------------------------------
         for i in self.option:
@@ -260,7 +266,8 @@ class optionsButtonsCRT2:
                                              command=execCommand)
             # button config:
             self.button_dict[i]['activebackground'] = bg_active
-            self.button_dict[i]['width'] = self.sixWidth - 40
+            # 1/x of width - padX value from both sides * num of buttons ↓
+            self.button_dict[i]['width'] = int(self.sixWidth - 2*padxValue*numOPT)
             self.button_dict[i]['bg'] = bg
             self.button_dict[i]['font'] = JS.jsonRed('font_info', "font")
             self.button_dict[i]['height'] = self.sixHeight
