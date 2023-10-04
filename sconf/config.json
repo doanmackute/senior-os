@@ -1,4 +1,7 @@
 {
+    "Version": {
+        "configVersion": 0.2
+    },
     "buttons_info": {
         "num_of_frame": 4,
         "num_of_menu_buttons": 2,

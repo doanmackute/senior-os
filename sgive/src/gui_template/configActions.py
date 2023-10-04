@@ -1,6 +1,7 @@
 import json
 import os
 
+
 def temporaryGetPath():
     currentDir = os.path.dirname(os.path.dirname(__file__))
     parentCurentDir = os.path.abspath(os.path.join(currentDir, os.pardir))
@@ -9,20 +10,32 @@ def temporaryGetPath():
     return confPath
 
 
-def configExistCheck():
+def configExistCheck(givenVersion):
     pathToJsonConf = temporaryGetPath()
     if os.path.exists(pathToJsonConf):
-        _jsonWrite()
-        return True
+        if os.path.isfile(os.path.join(pathToJsonConf,'config.json')):
+            currentVersion = jsonRed('Version', "configVersion")
+            if not currentVersion == givenVersion:
+                _jsonWrite(givenVersion)
+                print("LOG: updating conf.json")
+                return True
+            print("LOG: conf.json is already there, skipping")
+            return True
+        else:
+            _jsonWrite(givenVersion)
+            return True
     else:
         print("LOG: there is no path to the configuration file")
         return False
 
-def _jsonWrite():
-    # path to .json conf
+
+def _jsonWrite(currentVersion):
+    # default json config
     dictionary = {
+        'Version': {
+            "configVersion": currentVersion
+        },
         'buttons_info': {
-            "num_of_frame": 4,
             "num_of_menu_buttons": 2,
             "num_of_opt_on_frame": 4,
             "padx_value": 5,
@@ -48,12 +61,7 @@ def _jsonWrite():
 
 def jsonRed(key, value):
     path = temporaryGetPath()
-    # if there is no user, leave
-    if os.path.expanduser('~') is None:
-        print("Where is your home mate?")
-        return
-
-    if os.path.exists(path):
+    if os.path.exists(path):  # checks for the conf file, if there is any
         with open(os.path.join(path, 'config.json'), "r") as file:
             jsonData = json.load(file)
         return jsonData[key][value]
