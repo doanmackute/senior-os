@@ -51,6 +51,7 @@ def _jsonWrite(currentVersion):
             "font": "Helvetica 36 bold",
         },
         'resolution_info': {
+            "numOfScreen": 0,
             "height_divisor": 4.5,
             "width_divisor": 5,
         }

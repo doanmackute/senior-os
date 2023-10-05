@@ -16,9 +16,10 @@ def getButtonConf():
 
 
 def resolutionMath():
+    _numOfScreen = JS.jsonRed('resolution_info', "numOfScreen")
     # this is from screen_info imported get_monitors to get always the first screen
-    _screenWidth = get_monitors()[0].width
-    _screenHeight = get_monitors()[0].height
+    _screenWidth = get_monitors()[_numOfScreen].width
+    _screenHeight = get_monitors()[_numOfScreen].height
     # upper frame (MenuFrame)width and height
     panelWidth = int(_screenWidth / JS.jsonRed('resolution_info', "width_divisor"))
     panelHeight = int(_screenHeight / JS.jsonRed('resolution_info', "height_divisor"))
