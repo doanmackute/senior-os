@@ -52,13 +52,15 @@ class WriteMailFrame(ttk.Frame):
 
     def createWidgets(self):
         # widgets for writing an email
+
+        photo = tk.PhotoImage(file="img/exitButton.png")
         self.recipientLabel = ttk.Label(self, text="To: ", style="my.TLabel")
         self.subjectLabel = ttk.Label(self, text="Subject: ", style="my.TLabel")
         self.contentLabel = ttk.Label(self, text="Message: ", style="my.TLabel")
         self.recipientEntry = ttk.Entry(self, font=("Halvetica", 30))
         self.subjectEntry = ttk.Entry(self, font=("Halvetica", 30))
         self.contentEntry = tk.Text(self, font=("Halvetica", 30), height=8)
-        self.sendMailButton = ttk.Button(self, text="Send email", style="my.TButton", command=self.sendMail)
+        self.sendMailButton = ttk.Button(self, text="Send email", style="my.TButton", command=self.sendMail, image=photo)
 
         self.recipientLabel.grid(row=0, column=0, sticky="e", padx=10, pady=10, ipady=50)
         self.recipientEntry.grid(row=0, column=1, sticky="nsew", pady=10)
@@ -236,8 +238,6 @@ def main():
     style.configure("my.TLabel", font = (fontName, fontSize, fontWeight))
 
     defFrame = defaultFrame(window)
-    configActions.configExistCheck()
-    guiTemplate.getButtonConf()
 
     window.mainloop()
 

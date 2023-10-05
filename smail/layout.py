@@ -1,22 +1,89 @@
+import json
 import tkinter as tk
 from tkinter import ttk
 from style import font_config, button_config
 from mail_connection import sendEmail, readMail
+import demo.guiTemplate.guiTemplate as temp
 
+def search_mail(id):
+    with open("email_address_config.json", "r") as f:
+        data = json.loads(f.read())
+        emails = data["emails"]
+        email = emails[id]
+    f.close()
+    return email
 class defaultFrame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
+        self.app = temp.App(parent)
+        self.redefineButtons()
         self.currentFrame = readMailFrame(self)
         self.pack()
+
+    def redefineButtons(self):
+
+        options_buttons_crt1 = self.app.menuFrameCreateButtonsVal.optButtons1
+        options_buttons_crt2 = self.app.menuFrameCreateButtonsVal.optButtons2
+
+        with open("email_address_config.json", "r") as f:
+            data = json.loads(f.read())
+            emails = data["emails"]
+            personList = list(emails.keys())
+            images = data["images"]
+        f.close()
+
+        self.exitButtonText = "Odejít"
+        self.sendButtonText = "Send Email"
+        self.sendToText = "Send To"
+        self.person1Text = personList[0]
+        self.person2Text = personList[1]
+        self.person3Text = personList[2]
+        self.person4Text = personList[3]
+        self.person5Text = personList[4]
+
+        self.exitImage = tk.PhotoImage(file=images["exit"])
+        self.person1Image = tk.PhotoImage(file=images["Person1"])
+        self.person2Image = tk.PhotoImage(file=images["Person2"])
+        self.person3Image = tk.PhotoImage(file=images["Person3"])
+        self.person4Image = tk.PhotoImage(file=images["Person4"])
+        self.person5Image = tk.PhotoImage(file=images["Person5"])
+
+        options_buttons_crt1.button_dict[1].config(text="", image=self.exitImage)
+        options_buttons_crt1.button_dict[2].config(text=self.sendButtonText, command=self.changeFrame)
+        options_buttons_crt1.button_dict[3].config(text="", command= lambda :self.fillRecepient(self.person1Text), image=self.person1Image)
+        options_buttons_crt1.button_dict[4].config(text="", command=lambda :self.fillRecepient(self.person2Text), image=self.person2Image)
+        options_buttons_crt2.button_dict[1].config(text="", command=lambda :self.fillRecepient(self.person3Text), image=self.person3Image)
+        options_buttons_crt2.button_dict[2].config(text="", command=lambda :self.fillRecepient(self.person4Text), image=self.person4Image)
+        options_buttons_crt2.button_dict[3].config(text="", command=lambda :self.fillRecepient(self.person5Text), image=self.person5Image)
+        options_buttons_crt2.button_dict[4].config(text=self.sendToText, command=self.showWriteMailFrame)
 
     # switching frames
     def showWriteMailFrame(self):
         self.currentFrame.forget()
         self.currentFrame = writeMailFrame(self)
+        return self.currentFrame.getRecipientEntry()
 
     def showReadMailFrame(self):
         self.currentFrame.forget()
         self.currentFrame = readMailFrame(self)
+
+    def changeFrame(self):
+        if self.currentFrame.__class__ is readMailFrame:
+            print("readMailFrame")
+            self.showWriteMailFrame()
+        else:
+            self.showReadMailFrame()
+
+    def fillRecepient(self, id):
+        email = search_mail(id)
+        recipient = self.showWriteMailFrame()
+        recipient.delete(0, tk.END)
+        recipient.insert(0, email)
+        recipient.configure(state="disabled")
+
+
+
+
 class readMailFrame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -76,6 +143,7 @@ class writeMailFrame(ttk.Frame):
         self.contentEntry = tk.Text(self, font=font_config())
         self.sendMailButton = ttk.Button(self, text="Send email", style=button_config(), command=self.sendMail)
 
+
         self.recipientLabel.grid(row=0, column=1, sticky="e", padx=10, pady=10, ipady=50)
         self.recipientEntry.grid(row=0, column=2, sticky="nsew", padx=10, pady=10)
         self.subjectLabel.grid(row=1, column=1, sticky="e", padx=10, pady=10)
@@ -83,6 +151,9 @@ class writeMailFrame(ttk.Frame):
         self.contentLabel.grid(row=2, column=0, sticky="e", padx=10, pady=10)
         self.contentEntry.grid(row=2, column=1, columnspan = 3, padx=10, pady=10)
         self.sendMailButton.grid(row=3, column=1, columnspan=3, sticky="nsew", pady=10, padx=10)
+
+    def getRecipientEntry(self):
+        return self.recipientEntry
 
     def sendMail(self):
 

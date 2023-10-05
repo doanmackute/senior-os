@@ -1,0 +1,19 @@
+{
+    "emails":{
+        "Person1": "email1@gmail.com",
+        "Person2": "email2@gmail.com",
+        "Person3": "email3@gmail.com",
+        "Person4": "email4@gmail.com",
+        "Person5": "email5@gmail.com"
+    },
+
+    "images": {
+        "exit": "img/exitButton.png",
+        "Person1": "img/person1.png",
+        "Person2": "img/person2.png",
+        "Person3": "img/person3.png",
+        "Person4": "img/person4.png",
+        "Person5": "img/person5.png"
+    }
+}
+
