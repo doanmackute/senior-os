@@ -4,7 +4,7 @@ import demo.guiTemplate.configActions as act
 
 
 if __name__ == '__main__':
-    _currentVersionOfConfig = 0.2
+    _currentVersionOfConfig = 0.3
     isExist = act.configExistCheck(_currentVersionOfConfig)
     if isExist:
         root = Tk()
