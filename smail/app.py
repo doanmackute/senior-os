@@ -1,11 +1,14 @@
-from smail.layout import defaultFrame
-from tkinter import *
+import tkinter
+from smail.template import configActions as act
+from smail.layout import oneFrame
 
-
-def main():
-    root = Tk()
-    frame = defaultFrame(root)
-    root.mainloop()
 
 if __name__ == '__main__':
-    main()
+    _currentVersionOfConfig = 0.3
+    isExist = act.configExistCheck(_currentVersionOfConfig)
+    if isExist:
+        root = tkinter.Tk()
+        app = oneFrame(root)
+        root.mainloop()
+    else:
+        print("error")

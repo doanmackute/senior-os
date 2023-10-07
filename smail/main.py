@@ -99,7 +99,7 @@ class WriteMailFrame(ttk.Frame):
         # in order to be able to connect to the gmail mailbox, it is necessary to enter the email address and password for the appliaction
             # (password needs to be generated in google account via: google account -> security -> 2-step verification -> app passwords)
 
-        with open("credentials.json", "r") as f:
+        with open("config/credentials.json", "r") as f:
             credentials = json.loads(f.read())
             self.username = credentials["username"]
             self.password = credentials["password"]
@@ -160,7 +160,7 @@ class readMailFrame(ttk.Frame):
         # in order to be able to connect to the gmail mailbox, it is necessary to enter the email address and password for the appliaction
             # (password needs to be generated in google account via: google account -> security -> 2-step verification -> app passwords)
 
-        with open("credentials.json", "r") as f:
+        with open("config/credentials.json", "r") as f:
             credentials = json.loads(f.read())
             self.username = credentials["username"]
             self.password = credentials["password"]
@@ -219,7 +219,7 @@ def main():
     window = tk.Tk()
     window.title("Smail - Mail Client for Seniors")
 
-    with open("config.json", "r") as f:
+    with open("config/config.json", "r") as f:
         config = json.loads(f.read())
         fontName = config["data"]["fontName"]
         fontSize = config["data"]["fontSize"]

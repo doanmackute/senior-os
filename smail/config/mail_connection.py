@@ -3,6 +3,7 @@ import json
 import smtplib
 from email.mime.text import MIMEText
 import email
+import ssl
 
 # connection to the smtp/imap server and other information are taken from the credentials.json file
 # in order to be able to connect to the gmail mailbox, it is necessary to enter the email address and password for the appliaction
@@ -10,7 +11,7 @@ import email
 
 
 # reading credentials from json file
-with open("credentials.json", "r") as f:
+with open("config/credentials.json", "r") as f:
     credentials = json.loads(f.read())
     login = credentials["username"]
     password = credentials["password"]
@@ -21,6 +22,9 @@ with open("credentials.json", "r") as f:
 
 f.close()
 
+sslContext = ssl.create_default_context()
+
+
 def sendEmail(recipient, subject, content):
 
     msg = MIMEText(content)
@@ -29,7 +33,7 @@ def sendEmail(recipient, subject, content):
     msg['To'] = recipient
 
     try:
-        with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
+        with smtplib.SMTP_SSL(smtp_server, smtp_port, context=sslContext) as server:
             server.login(login, password)
             server.sendmail(login, recipient, msg.as_string())
         return 1
@@ -40,7 +44,7 @@ def sendEmail(recipient, subject, content):
 def readMail():
 
     try:
-        mail = imaplib.IMAP4_SSL(imap_server, imap_port)
+        mail = imaplib.IMAP4_SSL(imap_server, imap_port, ssl_context= sslContext)
         mail.login(login, password)
 
         #selecting folder from which to read e-mails
