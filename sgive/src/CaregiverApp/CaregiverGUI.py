@@ -9,89 +9,81 @@ logger = logging.getLogger(__file__)
 logger.info("initiated logging")
 
 
-def resolutionMath():
-    screenWidth = get_monitors()[readFile("resolution_info", "numOfScreen")].width
-    screenHeight = get_monitors()[readFile("resolution_info", "numOfScreen")].height
-    return screenWidth, screenHeight
-
-
 def getMac():
     mac = gmac()
-    print(mac)
     return mac
 
 class menuBarButtons:
-    def __init__(self, menuFrame: Frame, root: Tk, heightDivisor: int):
+    def __init__(self, menuFrame: Frame, root: Tk, heightDivisor: int, height: int, width: int):
+        self.height = height
+        self.width = width
         self.root = root
         self.menuFrame = menuFrame
         self.heightDivisor = heightDivisor
         self.xValue = 0
         self.options = ["GLOBAL", "MAIL", "WEB", "LOGS"]
-        self.optionsCounter = 0
         self.buttonDictionary = {}
         # calls section
-        self.callOPT = optFrame(self.root)  # call class for loweFrame
+        # self.callOPT = optFrame(self.root)  # call class for loweFrame
         self.buttons()
+        self.callOPT = optFrame(self.root, self.width, self.height)
 
     def buttons(self):
+        counter = 0
         self.options.append("EXIT")  # add exit as a last button
         for i in self.options:
-            def getButtonNum(x=self.optionsCounter, y=i):
-                print(f"num:{x}, name: {y}")  # placeholder
-                sortButtonsCommand(x, y)
-
-            self.buttonDictionary[self.optionsCounter] = Button(self.menuFrame)
-            self.buttonDictionary[self.optionsCounter]['text'] = i
-            self.buttonDictionary[self.optionsCounter]['bg'] = '#696969'
-            self.buttonDictionary[self.optionsCounter]['fg'] = 'white'
-            self.buttonDictionary[self.optionsCounter]['activebackground'] = '#373737'
-            self.buttonDictionary[self.optionsCounter]['activeforeground'] = 'white'
-            self.buttonDictionary[self.optionsCounter]['relief'] = 'solid'
-            self.buttonDictionary[self.optionsCounter]['command'] = getButtonNum
-            self.buttonDictionary[self.optionsCounter]['font'] = "Helvetica 36 bold"
-            if self.optionsCounter == 0:
-                self.buttonDictionary[self.optionsCounter].place(x=0, y=0, width=resolutionMath()[0] / len(self.options),
-                                                                 height=resolutionMath()[1] / self.heightDivisor)
+            def getButtonNum(y=counter):
+                if y == 0:
+                    self.callOPT.globalConfig(y)
+                elif y == 1:
+                    self.callOPT.mailConfig(y)
+                elif y == 2:
+                    self.callOPT.webConfig(y)
+                elif y == 3:
+                    self.callOPT.viewLogs(y)
+                elif y == int(len(self.options) - 1):
+                    exit(0)
+            self.buttonDictionary[counter] = Button(self.menuFrame)
+            self.buttonDictionary[counter]['text'] = i
+            self.buttonDictionary[counter]['bg'] = '#696969'
+            self.buttonDictionary[counter]['fg'] = 'white'
+            self.buttonDictionary[counter]['activebackground'] = '#373737'
+            self.buttonDictionary[counter]['activeforeground'] = 'white'
+            self.buttonDictionary[counter]['relief'] = 'solid'
+            self.buttonDictionary[counter]['command'] = getButtonNum
+            self.buttonDictionary[counter]['font'] = "Helvetica 36 bold"
+            if counter == 0:
+                self.buttonDictionary[counter].place(x=0, y=0, width=self.width / len(self.options),
+                                                                 height=self.height / self.heightDivisor)
             else:
-                self.xValue = self.xValue + int(resolutionMath()[0] / len(self.options))
-                self.buttonDictionary[self.optionsCounter].place(x=self.xValue, y=0,
-                                                                 width=resolutionMath()[0] / len(self.options),
-                                                                 height=resolutionMath()[1] / self.heightDivisor)
-            self.optionsCounter += 1
+                self.xValue = self.xValue + int(self.width / len(self.options))
+                self.buttonDictionary[counter].place(x=self.xValue, y=0,
+                                                                 width=self.width / len(self.options),
+                                                                 height=self.height / self.heightDivisor)
+            counter += 1
         logger.info("created buttons")
-
-        def sortButtonsCommand(x, y):
-            if y == 'LOGS':
-                self.callOPT.viewLogs(x)
-            elif y == 'GLOBAL':
-                self.callOPT.globalConfig(x)
-            elif y == 'MAIL':
-                self.callOPT.mailConfig(x)
-            elif y == 'WEB':
-                self.callOPT.webConfig(x)
-            elif y == 'EXIT':
-                logger.info("exiting application. (bye)")
-                exit(0)
 
 
 class optFrame:
-    def __init__(self, root):
+    def __init__(self, root: Tk, width: int, height: int):
+        self.width = width
+        self.height = height
         self.root = root
         self.heightDivisor = 7
         self.numberOfFrames = 5
-        self.valueI = 0
         self.whichFrameIsON = None
         self.langaugeOPT = ('Czech', 'English', 'Deutsch')
         self.frameDict = {}
         self.createFrame()
 
     def createFrame(self):
-        while self.valueI <= self.numberOfFrames:
-            self.frameDict[self.valueI] = Frame(self.root)
-            self.frameDict[self.valueI]['bg'] = "#1e1f22"
-            self.frameDict[self.valueI]['width'] = resolutionMath()[0]
-            self.frameDict[self.valueI]['height'] = resolutionMath()[1] - (resolutionMath()[1] / self.heightDivisor)
-            self.valueI += 1
+        valueOfI = 0
+        while valueOfI <= self.numberOfFrames:
+            self.frameDict[valueOfI] = Frame(self.root)
+            self.frameDict[valueOfI]['bg'] = "#1e1f22"
+            self.frameDict[valueOfI]['width'] = self.width
+            self.frameDict[valueOfI]['height'] = self.height - (self.height / self.heightDivisor)
+            valueOfI += 1
 
     def viewLogs(self, x):
         if not self.whichFrameIsON is None and self.whichFrameIsON != x:  # close whatever frame is on AppFrame section
@@ -102,8 +94,8 @@ class optFrame:
             self.whichFrameIsON = x
             self.frameDict[x].pack()
         # some setup
-        textThing = Text(self.frameDict[x], height=resolutionMath()[1] - (resolutionMath()[1] / 7),
-                         width=resolutionMath()[0],
+        textThing = Text(self.frameDict[x], height=self.height - (self.height / 7),
+                         width=self.width,
                          bg="gray")
         scroll = Scrollbar(orient=VERTICAL, )
         scroll.config(command=textThing.yview, )
@@ -159,6 +151,8 @@ class AppBase:
     def __init__(self, root: Tk):
         self.root = root
         self.heightDivisor = 7
+        self.screenWidth = get_monitors()[readFile("resolution_info", "numOfScreen")].width  # screen width
+        self.screenHeight = get_monitors()[readFile("resolution_info", "numOfScreen")].height  # screen height
         self.rootSetup()  # def for root window
         self.menuBarFrameSetup()  # def for creating menu bar frame
 
@@ -171,10 +165,10 @@ class AppBase:
     def menuBarFrameSetup(self):
         masterFrame = Frame(self.root)  # creating menu bar frame (tkinter.Frame)
         masterFrame.pack_propagate(False)
-        masterFrame['width'] = resolutionMath()[0]
-        masterFrame['height'] = resolutionMath()[1] / self.heightDivisor
+        masterFrame['width'] = self.screenWidth
+        masterFrame['height'] = self.screenHeight / self.heightDivisor
         masterFrame['bg'] = '#232323'
         masterFrame.pack(side=TOP)
         logger.info("created menuFrame")
         # call class for creating objects
-        menuBarButtons(masterFrame, self.root, self.heightDivisor)
+        menuBarButtons(masterFrame, self.root, self.heightDivisor, self.screenHeight, self.screenWidth)

@@ -1,8 +1,8 @@
 from tkinter import *
 import configurationActions as ryuconf
 import os
-import logging
 import CaregiverGUI as ryuGUI
+import logging
 
 logging.basicConfig(
     filename=os.path.join(ryuconf.temporaryGetPath(), 'CaregiverAPP.log'),
