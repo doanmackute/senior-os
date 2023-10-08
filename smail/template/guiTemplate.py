@@ -172,9 +172,11 @@ class menuButtonCRT:
         getValues = getButtonConf()
         bg = getValues[0]
         bg_active = getValues[1]
+        numOPT = JS.jsonRed('buttons_info', "num_of_opt_on_frame")
+        padxValue = JS.jsonRed('buttons_info', "padx_value")
         # end of collecting values for font and colors
         for i in self.option:
-            self.button_dict[i] = Button(self.menuBar, text=f"MENU {i}", command=lambda: self.menuActionUp())
+            self.button_dict[i] = Button(self.menuBar, text=f"MENU {i}", command=lambda: self.menuActionUp(), width=int((resolutionMath()[0]/(numOPT+1))))
             # buttons configuration:
             self.button_dict[i]['activebackground'] = bg_active
             self.button_dict[i]['bg'] = bg
@@ -242,7 +244,7 @@ class optionsButtonsCRT1:
 
             self.button_dict[i]['activebackground'] = bg_active
             # 1/x of width - padX value from both sides * num of buttons ↓
-            self.button_dict[i]['width'] = int(self.sixWidth - (2 * padxValue * numOPT))
+            self.button_dict[i]['width'] = int(self.sixWidth - (padxValue * numOPT))
             self.button_dict[i]['bg'] = bg
             self.button_dict[i]['font'] = JS.jsonRed('font_info', "font")
             self.button_dict[i]['height'] = self.sixHeight
@@ -285,6 +287,7 @@ class optionsButtonsCRT2:
         self.person3Image = PhotoImage(file=self.img["Person3"])
         self.person4Image = PhotoImage(file=self.img["Person4"])
         self.person5Image = PhotoImage(file=self.img["Person5"])
+        print(int(self.sixWidth - (padxValue * numOPT)))
 
         for i in self.option:
             def execCommand(x=i):  # this def stores current i of each button
@@ -304,12 +307,14 @@ class optionsButtonsCRT2:
             # button config:
             self.button_dict[i]['activebackground'] = bg_active
             # 1/x of width - padX value from both sides * num of buttons ↓
-            self.button_dict[i]['width'] = int(self.sixWidth - (2 * padxValue * numOPT))
+            self.button_dict[i]['width'] = int(self.sixWidth - (padxValue * numOPT))
             self.button_dict[i]['bg'] = bg
             self.button_dict[i]['font'] = JS.jsonRed('font_info', "font")
             self.button_dict[i]['height'] = self.sixHeight
             self.button_dict[i]['borderwidth'] = 2
             self.button_dict[i]['relief'] = 'solid'
+
+            self.button_dict[i].pack(side=LEFT, padx=padxValue)
 
 
 # this class creates root windows and calls needed classes

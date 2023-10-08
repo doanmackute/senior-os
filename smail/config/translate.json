@@ -1,7 +1,6 @@
 {
-  "lang": "de",
+  "lang": "en",
   "timer": 5000,
-
   "text": {
     "smail_en_exitButton": "Exit",
     "smail_en_sendEmailButton": "Send Email",
@@ -50,7 +49,5 @@
     "smail_de_person5": "audio/de_person5.mp3",
     "smail_de_sendEmailButton": "audio/de_sendEmail.mp3",
     "smail_de_sendToButton": "audio/de_sendTo.mp3"
-
   }
-
 }
