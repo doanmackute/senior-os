@@ -13,6 +13,7 @@ def getMac():
     mac = gmac()
     return mac
 
+
 class menuBarButtons:
     def __init__(self, menuFrame: Frame, root: Tk, heightDivisor: int, height: int, width: int):
         self.height = height
@@ -21,10 +22,9 @@ class menuBarButtons:
         self.menuFrame = menuFrame
         self.heightDivisor = heightDivisor
         self.xValue = 0
-        self.options = ["GLOBAL", "MAIL", "WEB", "LOGS"]
+        self.options = ryuconf.testRead("careConf", "menuButtonsList")
         self.buttonDictionary = {}
         # calls section
-        # self.callOPT = optFrame(self.root)  # call class for loweFrame
         self.buttons()
         self.callOPT = optFrame(self.root, self.width, self.height)
 
@@ -43,6 +43,7 @@ class menuBarButtons:
                     self.callOPT.viewLogs(y)
                 elif y == int(len(self.options) - 1):
                     exit(0)
+
             self.buttonDictionary[counter] = Button(self.menuFrame)
             self.buttonDictionary[counter]['text'] = i
             self.buttonDictionary[counter]['bg'] = '#696969'
@@ -54,12 +55,12 @@ class menuBarButtons:
             self.buttonDictionary[counter]['font'] = "Helvetica 36 bold"
             if counter == 0:
                 self.buttonDictionary[counter].place(x=0, y=0, width=self.width / len(self.options),
-                                                                 height=self.height / self.heightDivisor)
+                                                     height=self.height / self.heightDivisor)
             else:
                 self.xValue = self.xValue + int(self.width / len(self.options))
                 self.buttonDictionary[counter].place(x=self.xValue, y=0,
-                                                                 width=self.width / len(self.options),
-                                                                 height=self.height / self.heightDivisor)
+                                                     width=self.width / len(self.options),
+                                                     height=self.height / self.heightDivisor)
             counter += 1
         logger.info("created buttons")
 
@@ -70,11 +71,24 @@ class optFrame:
         self.height = height
         self.root = root
         self.heightDivisor = 7
-        self.numberOfFrames = 5
+        self.numberOfFrames = 4
         self.whichFrameIsON = None
         self.langaugeOPT = ('Czech', 'English', 'Deutsch')
         self.frameDict = {}
         self.createFrame()
+
+    """
+    Defs that are used later:
+    """
+    def refreshLogFrame(self, x):
+        for widgets in self.frameDict[x].winfo_children():
+            widgets.destroy()
+        self.viewLogs(x)
+
+
+    """
+    Creating base frame for all of the options:
+    """
 
     def createFrame(self):
         valueOfI = 0
@@ -85,13 +99,15 @@ class optFrame:
             self.frameDict[valueOfI]['height'] = self.height - (self.height / self.heightDivisor)
             valueOfI += 1
 
-    def clearFrame(self):
-        for widgets in self.frameDict[self.whichFrameIsON].winfo_children():
-            widgets.destroy()
+    """
+    Configuration for each options Frame:
+    """
 
     def viewLogs(self, x):
         if not self.whichFrameIsON is None and self.whichFrameIsON != x:  # close whatever frame is on AppFrame section
-            self.clearFrame()
+            # destroy all widget from frame, if there is any present (for refreshing data values)
+            for widgets in self.frameDict[x].winfo_children():
+                widgets.destroy()
             self.frameDict[self.whichFrameIsON].pack_forget()
             self.whichFrameIsON = x
             self.frameDict[x].pack()
@@ -99,15 +115,14 @@ class optFrame:
             self.whichFrameIsON = x
             self.frameDict[x].pack()
         # some setup
+        B = Button(self.frameDict[x], text="REFRESH", command= lambda : self.refreshLogFrame(x))
+        B.pack(side=TOP)
         textThing = Text(self.frameDict[x], height=self.height - (self.height / 7),
                          width=self.width,
                          bg="gray")
         scroll = Scrollbar(orient=VERTICAL, )
         scroll.config(command=textThing.yview, )
         textThing["yscrollcommand"] = scroll.set
-        labelThing = Label(self.frameDict[x], text="LOG")
-        labelThing.config(font=("Courier", 14))
-        labelThing.pack()
         textThing.pack()
         file = ryuconf.readLog()
         for f in file:
@@ -117,7 +132,6 @@ class optFrame:
 
     def globalConfig(self, x):
         if not self.whichFrameIsON is None and self.whichFrameIsON != x:
-            self.clearFrame()
             self.frameDict[self.whichFrameIsON].pack_forget()
             self.whichFrameIsON = x
             self.frameDict[x].pack()
@@ -135,19 +149,16 @@ class optFrame:
 
     def mailConfig(self, x):
         if not self.whichFrameIsON is None and self.whichFrameIsON != x:
-            self.clearFrame()
             self.frameDict[self.whichFrameIsON].pack_forget()
             self.whichFrameIsON = x
             self.frameDict[x].pack()
         else:
             self.whichFrameIsON = x
             self.frameDict[x].pack()
-
         logger.info("opened mail config frame")
 
     def webConfig(self, x):
         if not self.whichFrameIsON is None and self.whichFrameIsON != x:
-            self.clearFrame()
             self.frameDict[self.whichFrameIsON].pack_forget()
             self.whichFrameIsON = x
             self.frameDict[x].pack()
@@ -180,5 +191,5 @@ class AppBase:
         masterFrame['bg'] = '#232323'
         masterFrame.pack(side=TOP)
         logger.info("created menuFrame")
-        # call class for creating objects
+        # calling class for creating objects
         menuBarButtons(masterFrame, self.root, self.heightDivisor, self.screenHeight, self.screenWidth)
