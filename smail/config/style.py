@@ -1,6 +1,8 @@
 import json
 import pygame
-from tkinter import ttk
+from tkinter import ttk, PhotoImage
+import PIL
+from PIL import Image, ImageTk
 
 
 def font_config():
@@ -89,3 +91,13 @@ def button_leave(button, enter_time):
     # before the specified delay.
     if enter_time[0]:
         button.after_cancel(enter_time[0])
+
+def imageConfig(name, btn_height):
+    data = images()
+    path = data[name]
+    original_image = Image.open(path)
+    height_ratio = btn_height / original_image.height
+    new_height = int(original_image.height * height_ratio)
+    resized_image = original_image.resize((int(original_image.width * height_ratio), new_height), PIL.Image.LANCZOS)
+    image = ImageTk.PhotoImage(resized_image)
+    return image

@@ -8,12 +8,12 @@
     },
 
     "images": {
-        "exit": "img/exitButton.png",
-        "Person1": "img/person1.png",
-        "Person2": "img/person2.png",
-        "Person3": "img/person3.png",
-        "Person4": "img/person4.png",
-        "Person5": "img/person5.png"
+        "exit": "img/SMAIL_CL_EXIT_1.png",
+        "Person1": "img/SMAIL_CL_PERSON_1.png",
+        "Person2": "img/SMAIL_CL_PERSON_2.png",
+        "Person3": "img/SMAIL_CL_PERSON_3.png",
+        "Person4": "img/SMAIL_CL_PERSON_4.png",
+        "Person5": "img/SMAIL_CL_PERSON_5.png"
     }
 }
 

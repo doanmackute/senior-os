@@ -79,7 +79,7 @@ def readMail():
                         message_deocde = message.decode("utf-8")
 
                     except Exception as error:
-                        print("trying different formatting", error)
+                        print(f"trying different formatting for email from {email_message['from']}; error: {error}")
                         message_deocde = message.decode("latin-1")
 
                     email_content = ("Subject: " + email_message["subject"]

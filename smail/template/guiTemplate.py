@@ -3,7 +3,7 @@ Written by: RYUseless
 """
 import tkinter
 from tkinter import *
-from smail.config.style import images, getLanguage
+from smail.config.style import imageConfig, getLanguage, images
 import sgive.src.gui_template.configActions as JS
 from screeninfo import get_monitors
 
@@ -215,9 +215,9 @@ class optionsButtonsCRT1:
         # -------------------------------------------
         self.language, self.text = getLanguage()
         self.img = images()
-        self.exitImage = PhotoImage(file=self.img["exit"])
-        self.person1Image = PhotoImage(file=self.img["Person1"])
-        self.person2Image = PhotoImage(file=self.img["Person2"])
+        self.exitImage = imageConfig("exit", self.sixHeight)
+        self.person1Image = imageConfig("Person1", self.sixHeight)
+        self.person2Image = imageConfig("Person2", self.sixHeight)
 
         for i in self.option:
 
@@ -227,9 +227,10 @@ class optionsButtonsCRT1:
             if i == 1:  # make first button exit button
                 self.button_dict[i] = Button(self.optionsBar, image=self.exitImage, compound="c",
                                              command=exit)  # exit == exit(0)
+
             elif i == 2:
                 self.button_dict[i] = Button(self.optionsBar,
-                                             text=self.text[f"smail_{self.language}_sendEmailButton"],
+                                             # text=self.text[f"smail_{self.language}_sendEmailButton"],
                                              image=self.dummyPixel, compound="c",
                                              command=execCommand)
             elif i ==3:
@@ -283,11 +284,10 @@ class optionsButtonsCRT2:
         # end of collecting values for font and colors
         # -------------------------------------------
         self.language, self.text = getLanguage()
-        self.img = images()
-        self.person3Image = PhotoImage(file=self.img["Person3"])
-        self.person4Image = PhotoImage(file=self.img["Person4"])
-        self.person5Image = PhotoImage(file=self.img["Person5"])
-        print(int(self.sixWidth - (padxValue * numOPT)))
+
+        self.person3Image = imageConfig("Person3", self.sixHeight)
+        self.person4Image = imageConfig("Person4", self.sixHeight)
+        self.person5Image = imageConfig("Person5", self.sixHeight)
 
         for i in self.option:
             def execCommand(x=i):  # this def stores current i of each button
