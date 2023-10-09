@@ -85,8 +85,13 @@ class optFrame:
             self.frameDict[valueOfI]['height'] = self.height - (self.height / self.heightDivisor)
             valueOfI += 1
 
+    def clearFrame(self):
+        for widgets in self.frameDict[self.whichFrameIsON].winfo_children():
+            widgets.destroy()
+
     def viewLogs(self, x):
         if not self.whichFrameIsON is None and self.whichFrameIsON != x:  # close whatever frame is on AppFrame section
+            self.clearFrame()
             self.frameDict[self.whichFrameIsON].pack_forget()
             self.whichFrameIsON = x
             self.frameDict[x].pack()
@@ -112,6 +117,7 @@ class optFrame:
 
     def globalConfig(self, x):
         if not self.whichFrameIsON is None and self.whichFrameIsON != x:
+            self.clearFrame()
             self.frameDict[self.whichFrameIsON].pack_forget()
             self.whichFrameIsON = x
             self.frameDict[x].pack()
@@ -119,6 +125,8 @@ class optFrame:
             self.whichFrameIsON = x
             self.frameDict[x].pack()
 
+        # use checkButton widgets
+        # figure out way how to get values to config.json
         var = StringVar(self.frameDict[x])
         var.set(self.langaugeOPT[0])
         option = OptionMenu(self.frameDict[x], var, *self.langaugeOPT)
@@ -127,6 +135,7 @@ class optFrame:
 
     def mailConfig(self, x):
         if not self.whichFrameIsON is None and self.whichFrameIsON != x:
+            self.clearFrame()
             self.frameDict[self.whichFrameIsON].pack_forget()
             self.whichFrameIsON = x
             self.frameDict[x].pack()
@@ -138,6 +147,7 @@ class optFrame:
 
     def webConfig(self, x):
         if not self.whichFrameIsON is None and self.whichFrameIsON != x:
+            self.clearFrame()
             self.frameDict[self.whichFrameIsON].pack_forget()
             self.whichFrameIsON = x
             self.frameDict[x].pack()
