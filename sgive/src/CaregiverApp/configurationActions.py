@@ -1,6 +1,8 @@
-import json, codecs
+import json
 import os
 import logging
+from getmac import get_mac_address as gmac
+
 
 logger = logging.getLogger(__file__)
 logger.info("initiated logging")
@@ -50,9 +52,13 @@ def editConfig(key, name, value):
     with open('data.json', 'w') as f:
         json.dump(data, f, indent=4)
 
+def getMac():
+    mac = gmac()
+    return mac
+
 
 def caregiverAppConfig():
-    options = ["Global\nconfig", "Mail", "Web", "LOGS"]
+    options = ["Global\nconfig", "Mail\nconfig", "Web\nconfig", "LOGS"]
     dictionary = {
         'GlobalConfiguration': {
             "language": "czech",
@@ -62,14 +68,14 @@ def caregiverAppConfig():
             "alertSoundLanguage": "czech",
             "fontSize": "36",
             "fontFamily": "someCoolName",
-            "macAddress": "1:1:1:1:",
+            "macAddress": getMac(),
         },
         'smail': {
-            "smtp": "czech",
-            "imap": "colorful",
-            "icons": 5,
-            "photographyURL": "red",
-            "soundsUrl": "czech",
+            "smtp": "X",
+            "imap": "X",
+            "icons": "X",
+            "photographyURL": "X",
+            "soundsUrl": "X",
         },
         'sweb': {
             "photography": "X",

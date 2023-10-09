@@ -9,11 +9,6 @@ logger = logging.getLogger(__file__)
 logger.info("initiated logging")
 
 
-def getMac():
-    mac = gmac()
-    return mac
-
-
 class menuBarButtons:
     def __init__(self, menuFrame: Frame, root: Tk, heightDivisor: int, height: int, width: int):
         self.height = height
