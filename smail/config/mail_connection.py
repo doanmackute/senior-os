@@ -1,3 +1,7 @@
+import logging
+
+logger = logging.getLogger(__file__)
+
 import imaplib
 import json
 import smtplib
@@ -13,20 +17,23 @@ import re
 # (password needs to be generated in google account via:
 #   google account -> security -> 2-step verification -> app passwords)
 
+try:
+    # reading credentials from json file
+    with open("config/credentials.json", "r") as f:
+        credentials = json.loads(f.read())
+        login = credentials["username"]
+        password = credentials["password"]
+        smtp_server = credentials["smtp_server"]
+        smtp_port = credentials["smtp_port"]
+        imap_server = credentials["imap_server"]
+        imap_port = credentials["imap_port"]
+    f.close()
+    sslContext = ssl.create_default_context()
+    logger.info("Email Credentials read successfully.")
+except Exception:
+    logger.error("Couldn't read email credentials and server names.")
 
-# reading credentials from json file
-with open("config/credentials.json", "r") as f:
-    credentials = json.loads(f.read())
-    login = credentials["username"]
-    password = credentials["password"]
-    smtp_server = credentials["smtp_server"]
-    smtp_port = credentials["smtp_port"]
-    imap_server = credentials["imap_server"]
-    imap_port = credentials["imap_port"]
 
-f.close()
-
-sslContext = ssl.create_default_context()
 
 
 def sendEmail(recipient, subject, content):
@@ -45,6 +52,8 @@ def sendEmail(recipient, subject, content):
         return 1
 
     except Exception as error:
+        logger.error("Error occurred when trying to send email. "
+                     "Check email and password configuration.", exc_info=True)
         return error
 
 
@@ -55,6 +64,7 @@ def readMail():
             imap_server, imap_port, ssl_context=sslContext
         )
         mail.login(login, password)
+        logger.info("Successful connection to IMAP server.")
 
         # selecting folder from which to read e-mails
         mail.select("INBOX")
@@ -79,7 +89,9 @@ def readMail():
                         message_deocde = message.decode("utf-8")
 
                     except Exception as error:
-                        print(f"trying different formatting for email from {email_message['from']}; error: {error}")
+                        logger.warning(f"trying different formatting for email "
+                                     f"from {email_message['from']};"
+                                    f" error: {error}")
                         message_deocde = message.decode("latin-1")
 
                     email_content = ("Subject: " + email_message["subject"]
@@ -88,18 +100,23 @@ def readMail():
                                      + "\nMessage:\n" + message_deocde)
                     emails.append(email_content)
                     break
-
+        logger.info("Emails successfully loaded.")
         return emails
 
     except Exception as error:
+        logger.error("Error when trying to connect to imap server,"
+                     " check your username and password!", exc_info=True)
         print("Error when trying to connect to imap server,"
               " check your username and password!", error)
 
 
 def checkCustomDB(email_address):
-    with open("antiphishing/custom_email_block.json", "r") as f:
-        data = json.loads(f.read())
-    f.close()
+    try:
+        with open("antiphishing/custom_email_block.json", "r") as f:
+            data = json.loads(f.read())
+        f.close()
+    except Exception:
+        logger.error("Couldn't load custom_email_block.json", exc_info=True)
 
     if email_address in data:
         print(email_address, " is in custom blacklist.")
@@ -110,10 +127,12 @@ def checkCustomDB(email_address):
 
 
 def checkDomainBP(email_address):
-
-    with open("antiphishing/domains.json", "r") as f:
-        data = json.loads(f.read())
-    f.close()
+    try:
+        with open("antiphishing/domains.json", "r") as f:
+            data = json.loads(f.read())
+        f.close()
+    except Exception:
+        logger.error("Couldn't read domains.json.", exc_info=True)
 
     email = email_address.split("@")[1]
 

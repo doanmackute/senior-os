@@ -1,26 +1,26 @@
+import logging
 import json
 import pygame
 from tkinter import ttk, PhotoImage
 import PIL
 from PIL import Image, ImageTk
 
+logger = logging.getLogger(__file__)
 
 def font_config():
-
-    with open("../sconf/config.json", "r") as f:
-        config = json.loads(f.read())
-        font_info = config["font_info"]["font"]
-    f.close()
-
-    return font_info
+    try:
+        with open("../sconf/config.json", "r") as f:
+            config = json.loads(f.read())
+            font_info = config["font_info"]["font"]
+        f.close()
+        return font_info
+    except Exception:
+        logger.error("Couldn't read fontconfig, file is missing.", exc_info=True)
 
 
 def button_config():
-    with open("../sconf/config.json", "r") as f:
-        config = json.loads(f.read())
-        font_info = config["font_info"]["font"]
-    f.close()
 
+    font_info = font_config()
     style = ttk.Style()
     style.configure("my.TButton", font=font_info)
 
@@ -28,43 +28,56 @@ def button_config():
 
 
 def images():
+    try:
+        with open("config/email_address_config.json", "r") as f:
+            data = json.loads(f.read())
+            images = data["images"]
+        f.close()
+        return images
+    except Exception:
+        logger.error("Couldn't find email_address_config.json", exc_info=True)
 
-    with open("config/email_address_config.json", "r") as f:
-        data = json.loads(f.read())
-        images = data["images"]
-    f.close()
-
-    return images
 
 
 def search_mail(id):
-    with open("config/email_address_config.json", "r") as f:
-        data = json.loads(f.read())
-        emails = data["emails"]
-        email = emails[f"Person{id}"]
-    f.close()
-    return email
+    try:
+        with open("config/email_address_config.json", "r") as f:
+            data = json.loads(f.read())
+            emails = data["emails"]
+            email = emails[f"Person{id}"]
+        f.close()
+        return email
+    except Exception:
+        logger.error("Couldn't find email_address_config.json", exc_info=True)
 
 
 def getLanguage():
-    with open("config/translate.json") as f:
-        translate = json.loads(f.read())
-        language = translate["lang"]
-        text = translate["text"]
-    f.close()
-    return language, text
+    try:
+        with open("config/translate.json") as f:
+            translate = json.loads(f.read())
+            language = translate["lang"]
+            text = translate["text"]
+        f.close()
+        return language, text
+    except Exception:
+        logger.error("Couldn't locate translation file: translate.json",
+                     exc_info=True)
 
 
 # audio session
 def getAudio():
     # reads configuration from json file
-    with open("config/translate.json") as f:
-        translate = json.loads(f.read())
-        language = translate["lang"]
-        audio = translate["audio"]
-        timer = translate["timer"]
-    f.close()
-    return language, audio, timer
+    try:
+        with open("config/translate.json") as f:
+            translate = json.loads(f.read())
+            language = translate["lang"]
+            audio = translate["audio"]
+            timer = translate["timer"]
+        f.close()
+        return language, audio, timer
+    except Exception:
+        logger.error("Couldn't locate translation file: translate.json",
+                     exc_info=True)
 
 
 def play_sound(button_name):

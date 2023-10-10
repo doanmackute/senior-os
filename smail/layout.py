@@ -1,3 +1,4 @@
+import logging
 import tkinter as tk
 from tkinter import scrolledtext
 from smail.config.style import (font_config, search_mail,
@@ -5,19 +6,25 @@ from smail.config.style import (font_config, search_mail,
 from smail.config.mail_connection import sendEmail, readMail, checkEmailForSpam
 from smail.template import guiTemplate as temp
 
+logger = logging.getLogger(__file__)
+
 
 class oneFrame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
+        # initiate logging
+        logger.info("Initiated logging.")
         self.menu = temp.App(parent)
         # import buttons from GUI template
         self.redefineTemplateButtons()
+        self.button_state = None
         self.language, self.text = getLanguage()
         # grid configuration
         self.columnconfigure(0, weight=1, uniform="a")
         self.columnconfigure(1, weight=3, uniform="a")
         self.lFrame = self.leftFrame()
         self.rFrame = self.rightWriteFrame()
+
         self.lFrame.grid(
             column=0
         )
@@ -25,6 +32,60 @@ class oneFrame(tk.Frame):
             column=1, row=0
         )
         self.pack()
+
+    def redefineTemplateButtons(self):
+        try:
+            self.options_buttons_crt1 = (
+                self.menu.menuFrameCreateButtonsVal.optButtons1
+            )
+            self.options_buttons_crt2 = (
+                self.menu.menuFrameCreateButtonsVal.optButtons2
+            )
+            self.exitButton = self.options_buttons_crt1.button_dict[1]
+            self.audioConfigure(self.exitButton, "exitButton")
+            # self.sendEmailButton = self.options_buttons_crt1.button_dict[2]
+            # self.audioConfigure(self.sendEmailButton, "sendEmailButton")
+            self.sendMailPerson1 = self.options_buttons_crt1.button_dict[3]
+            self.audioConfigure(self.sendMailPerson1, "person1")
+            self.sendMailPerson2 = self.options_buttons_crt1.button_dict[4]
+            self.audioConfigure(self.sendMailPerson2, "person2")
+            self.sendMailPerson3 = self.options_buttons_crt2.button_dict[1]
+            self.audioConfigure(self.sendMailPerson3, "person3")
+            self.sendMailPerson4 = self.options_buttons_crt2.button_dict[2]
+            self.audioConfigure(self.sendMailPerson4, "person4")
+            self.sendMailPerson5 = self.options_buttons_crt2.button_dict[3]
+            self.audioConfigure(self.sendMailPerson5, "person5")
+            self.sendMailTo = self.options_buttons_crt2.button_dict[4]
+            self.audioConfigure(self.sendMailTo, "sendToButton")
+
+            # self.sendEmailButton.config(
+            #     command=self.sendMail,
+            # )
+            self.sendMailPerson1.config(
+                command=lambda: self.fillRecipient(1),
+            )
+            self.sendMailPerson2.config(
+                command=lambda: self.fillRecipient(2),
+            )
+            self.sendMailPerson3.config(
+                command=lambda: self.fillRecipient(3),
+            )
+            self.sendMailPerson4.config(
+                command=lambda: self.fillRecipient(4),
+            )
+            self.sendMailPerson5.config(
+                command=lambda: self.fillRecipient(5),
+            )
+            self.sendMailTo.config(
+                command=lambda: self.fillRecipient(0),
+            )
+            logger.info("Buttons successfully redefined.")
+        except AttributeError:
+            logger.error("AttributeError:", exc_info=True)
+        except KeyError:
+            logger.error("KeyError:", exc_info=True)
+        except Exception:
+            logger.error("Error:", exc_info=True)
 
     def leftFrame(self):
         self.frame = tk.Frame(self)
@@ -48,110 +109,50 @@ class oneFrame(tk.Frame):
         )
         self.insertEmails()
 
+        logger.info("Created left frame with received emails in listbox.")
         return self.frame
 
-    def insertEmails(self):
-
-        try:
-            self.emails = readMail()
-            try:
-                self.safe_emails = checkEmailForSpam(self.emails)
-                for n in self.safe_emails:
-                    self.inboxList.insert(tk.END, n.split("From:")[0])
-                    # binding listbox to text area to view email
-                    self.inboxList.bind("<<ListboxSelect>>", self.showEmail)
-            except Exception as error:
-                print("Failed to apply anti-phishing filters. "
-                      "Omitting security steps. ", error)
-                self.safe_emails = self.emails
-                for n in self.emails:
-                    self.inboxList.insert(tk.END, n.split("From:")[0])
-                    # binding listbox to text area to view email
-                    self.inboxList.bind("<<ListboxSelect>>", self.showEmail)
-        except Exception as error:
-            print("Error when trying to fill in the listbox. ", error)
-
-    def showEmail(self, event):
-        # switch frames
-        self.switchToReadingMail()
-
-        if not self.inboxList.curselection():
-            # If no selection, use the last selected email
-            if (self.lastSelectedIndex is not None
-                    and self.lastSelectedEmail is not None):
-                self.messageArea.configure(state="normal")
-                self.messageArea.delete("1.0", tk.END)
-                self.messageArea.insert(tk.END, self.lastSelectedEmail)
-                self.messageArea.configure(state="disabled")
-            return
-
-        self.selectedIndex = self.inboxList.curselection()[0]
-        selectedEmail = self.safe_emails[self.selectedIndex]
-        self.messageArea.configure(state="normal")
-        self.messageArea.delete("1.0", tk.END)
-        self.messageArea.insert(tk.END, selectedEmail)
-        self.messageArea.configure(state="disabled")
-
-        # Update the last selected index and email
-        self.lastSelectedIndex = self.selectedIndex
-        self.lastSelectedEmail = selectedEmail
-
-    def switchToReadingMail(self):
-        self.rFrame = self.rightReadFrame()
-        self.rFrame.grid(
-            column=1, row=0
-        )
-        self.pack()
-
-    def switchToWriteMail(self):
-        self.rFrame = self.rightWriteFrame()
-        self.rFrame.grid(
-            column=1, row=0
-        )
-        self.pack()
-        return self.recipientEntry
-
     def rightWriteFrame(self):
-        self.rframe = tk.Frame(self)
-        self.rframe.columnconfigure((0, 1), weight=1, uniform="a")
-        self.rframe.rowconfigure((0, 1, 2, 4), weight=1, uniform="a")
-        self.rframe.rowconfigure(3, weight=2, uniform="a")
+        self.rwframe = tk.Frame(self)
+        self.rwframe.columnconfigure((0, 1), weight=1, uniform="a")
+        self.rwframe.rowconfigure((0, 1, 2, 4), weight=1, uniform="a")
+        self.rwframe.rowconfigure(3, weight=2, uniform="a")
         self.recipientLabel = tk.Label(
-            self.rframe,
+            self.rwframe,
             text=self.text[f"smail_{self.language}_recipientLabel"],
             font=font_config()
         )
         self.subjectLabel = tk.Label(
-            self.rframe,
+            self.rwframe,
             text=self.text[f"smail_{self.language}_subjectLabel"],
             font=font_config()
         )
         self.contentLabel = tk.Label(
-            self.rframe,
+            self.rwframe,
             text=self.text[f"smail_{self.language}_messageLabel"],
             font=font_config()
         )
         self.recipientEntry = tk.Entry(
-            self.rframe, font=font_config()
+            self.rwframe, font=font_config()
         )
         self.subjectEntry = tk.Entry(
-            self.rframe, font=font_config()
+            self.rwframe, font=font_config()
         )
         self.contentEntry = scrolledtext.ScrolledText(
-            self.rframe, font=font_config(), height=10
+            self.rwframe, font=font_config(), height=10
         )
         # widget placement
         self.recipientLabel.grid(
             row=0, column=0,
-            sticky="nse", padx=10, pady=10
+            sticky="e", padx=10, pady=10
         )
         self.subjectLabel.grid(
             row=1, column=0,
-            sticky="nse", padx=10, pady=10
+            sticky="e", padx=10, pady=10
         )
         self.contentLabel.grid(
             row=2, column=0,
-            sticky="nsw", padx=10, pady=10
+            sticky="w", padx=10, pady=10
         )
         self.recipientEntry.grid(
             row=0, column=1,
@@ -165,7 +166,8 @@ class oneFrame(tk.Frame):
             row=3, column=0, columnspan=2, rowspan=2,
             padx=10, pady=10, ipady=10, sticky="new"
         )
-        return self.rframe
+
+        return self.rwframe
 
     def rightReadFrame(self):
         self.rrframe = tk.Frame(self)
@@ -187,79 +189,138 @@ class oneFrame(tk.Frame):
             row=1, column=0,
             sticky="nsew", padx=20, pady=20
         )
+
         return self.rrframe
+
+    def insertEmails(self):
+
+        try:
+            self.emails = readMail()
+            try:
+                self.safe_emails = checkEmailForSpam(self.emails)
+                for n in self.safe_emails:
+                    self.inboxList.insert(tk.END, n.split("From:")[0])
+                    # binding listbox to text area to view email
+                    self.inboxList.bind("<<ListboxSelect>>", self.showEmail)
+                logger.info("Anti-phishing filters applied.")
+            except Exception:
+                logger.critical("Failed to apply anti-phishing filters."
+                                "Omitting security steps.", exc_info=True)
+                self.safe_emails = self.emails
+                for n in self.emails:
+                    self.inboxList.insert(tk.END, n.split("From:")[0])
+                    # binding listbox to text area to view email
+                    self.inboxList.bind("<<ListboxSelect>>", self.showEmail)
+        except Exception:
+            logger.error("Error when trying to fill in the listbox. ",
+                         exc_info=True)
+
+    def showEmail(self, event):
+        # switch frames
+        self.switchToReadingMail()
+
+        if not self.inboxList.curselection():
+            # If no selection, use the last selected email
+            if (self.lastSelectedIndex is not None
+                    and self.lastSelectedEmail is not None):
+                self.configureMessageArea(self.lastSelectedEmail)
+
+        selectedIndex = self.inboxList.curselection()[0]
+        selectedEmail = self.safe_emails[selectedIndex]
+        self.configureMessageArea(selectedEmail)
+
+        # Update the last selected index and email
+        self.lastSelectedIndex = selectedIndex
+        self.lastSelectedEmail = selectedEmail
+
+    def configureMessageArea(self, email):
+        self.messageArea.configure(state="normal")
+        self.messageArea.delete("1.0", tk.END)
+        self.messageArea.insert(tk.END, email)
+        self.messageArea.configure(state="disabled")
+
+    def switchToReadingMail(self):
+        self.rFrame = self.rightReadFrame()
+        self.rFrame.grid(
+            column=1, row=0
+        )
+        self.pack()
+
+    def switchToWriteMail(self):
+        self.rFrame = self.rightWriteFrame()
+        self.rFrame.grid(
+            column=1, row=0
+        )
+        self.pack()
+        return self.recipientEntry
 
     def getRecipientEntry(self):
         return self.recipientEntry
 
-    def sendMail(self):
+    def sendEmailStatus(self):
 
         succ = sendEmail(
             self.recipientEntry.get(), self.subjectEntry.get(),
             self.contentEntry.get("1.0", tk.END)
         )
 
+        # this logging in mail_connection.py
         if succ == 1:
+            logger.info(f"Email successfully sent to "
+                        f"{self.recipientEntry.get()}.")
             self.recipientEntry.delete(0, tk.END)
             self.subjectEntry.delete(0, tk.END)
             self.contentEntry.delete("1.0", tk.END)
-        else:
-            print("Error occurred when trying to send email. "
-                  "Check your email and password.", succ)
-
-    def redefineTemplateButtons(self):
-
-        self.options_buttons_crt1 = (
-            self.menu.menuFrameCreateButtonsVal.optButtons1
-        )
-        self.options_buttons_crt2 = (
-            self.menu.menuFrameCreateButtonsVal.optButtons2
-        )
-        self.exitButton = self.options_buttons_crt1.button_dict[1]
-        self.audioConfigure(self.exitButton, "exitButton")
-        # self.sendEmailButton = self.options_buttons_crt1.button_dict[2]
-        # self.audioConfigure(self.sendEmailButton, "sendEmailButton")
-        self.sendMailPerson1 = self.options_buttons_crt1.button_dict[3]
-        self.audioConfigure(self.sendMailPerson1, "person1")
-        self.sendMailPerson2 = self.options_buttons_crt1.button_dict[4]
-        self.audioConfigure(self.sendMailPerson2, "person2")
-        self.sendMailPerson3 = self.options_buttons_crt2.button_dict[1]
-        self.audioConfigure(self.sendMailPerson3, "person3")
-        self.sendMailPerson4 = self.options_buttons_crt2.button_dict[2]
-        self.audioConfigure(self.sendMailPerson4, "person4")
-        self.sendMailPerson5 = self.options_buttons_crt2.button_dict[3]
-        self.audioConfigure(self.sendMailPerson5, "person5")
-        self.sendMailTo = self.options_buttons_crt2.button_dict[4]
-        self.audioConfigure(self.sendMailTo, "sendToButton")
-
-        # self.sendEmailButton.config(
-        #     command=self.sendMail,
-        # )
-        self.sendMailPerson1.config(
-            command=lambda: self.fillRecipient(1),
-        )
-        self.sendMailPerson2.config(
-            command=lambda: self.fillRecipient(2),
-        )
-        self.sendMailPerson3.config(
-            command=lambda: self.fillRecipient(3),
-        )
-        self.sendMailPerson4.config(
-            command=lambda: self.fillRecipient(4),
-        )
-        self.sendMailPerson5.config(
-            command=lambda: self.fillRecipient(5),
-        )
-        self.sendMailTo.config(
-            command=self.switchToWriteMail,
-        )
+        # else:
+        #     logger.error("Error occurred when trying to send email."
+        #                   "Check email and password configuration.")
+        #     # print("Error occurred when trying to send email. "
+        #     #       "Check email and password configuration.", succ)
 
     def fillRecipient(self, id):
-        email = search_mail(id)
-        recipient = self.switchToWriteMail()
-        recipient.delete(0, tk.END)
-        recipient.insert(0, email)
-        recipient.configure(state="disabled")
+        # if every Entry obtains text, message will be sent
+        # when pressing Person[id] button for the second time.
+        if (self.recipientEntry.get() and self.subjectEntry.get() and
+                self.contentEntry.get("1.0", tk.END).strip() and
+                id == self.button_state):
+            self.sendEmailStatus()
+
+        # if another Person[id] button is pressed,
+        # Entries will be deleted,
+        # new recipient entry will be filled in.
+        elif (self.subjectEntry.get() or
+              self.contentEntry.get("1.0", tk.END).strip()):
+            if id != self.button_state:
+                print("No content to send.")
+                email = search_mail(id)
+                recipient = self.switchToWriteMail()
+                recipient.delete(0, tk.END)
+                recipient.insert(0, email)
+                recipient.configure(state="disabled")
+            # if Person[id] button is pressed for the second time,
+            # but one of the entry is not filled in, nothing will happen
+            else:
+                print("one of the entries is not filled in.")
+
+        else:
+            # if Send To button is pressed, frame is switched and
+            # recipient entry is deleted.
+            if id == 0:
+                print("Send To button pressed")
+                recipient = self.switchToWriteMail()
+                recipient.delete(0, tk.END)
+            # if Person[id] button is pressed for the second time,
+            # but none of the entry is filled in.
+            else:
+                print("Button pressed for the second time,"
+                      " no entry is filled in.")
+                email = search_mail(id)
+                recipient = self.switchToWriteMail()
+                recipient.delete(0, tk.END)
+                recipient.insert(0, email)
+                recipient.configure(state="disabled")
+
+        self.button_state = id
 
     def audioConfigure(self, button, button_name):
         enter_time = [None]
