@@ -12,6 +12,7 @@ logging.basicConfig(
 )
 
 if __name__ == '__main__':
+    ryuconf.caregiverAppConfig()
     root = Tk()
     ryuGUI.AppBase(root)
     root.mainloop()
