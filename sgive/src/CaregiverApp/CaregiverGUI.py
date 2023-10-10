@@ -74,7 +74,7 @@ class configFrame:
         self.createFrame()
         self._isGlobalConfigRunning = False
         # change language things:
-        self.widthLabel = 600
+        self.widthLabel = self.width / 2.8
         self.widthButton = 200
         self.Xposition = 0
         self.Yposition = 10
@@ -104,7 +104,10 @@ class configFrame:
 
     def restoreGlobalConfigs(self):
         ryuconf.caregiverAppConfig()
-        self.changeLanguageDict[self.pickedButton].configure(bg="#D3D3D3", activebackground="#bdbbbb")
+        if not self.pickedButton is None:
+            self.changeLanguageDict[self.pickedButton].configure(bg="#D3D3D3", activebackground="#bdbbbb")
+        else:
+            return
 
 
     """
@@ -205,7 +208,7 @@ class configFrame:
 
         colorModeLabel = Label(self.frameDict[x],text="Choose if you want your system to be in white or black:")
         colorModeLabel['font'] = "Helvetica 12 bold"
-        colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=600, height=self.heightWidgets)
+        colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
         # CHOOSE DELAY SECTION --------------------------------------
 
@@ -214,7 +217,7 @@ class configFrame:
 
         soundDelayLabel = Label(self.frameDict[x],text="Choose for how long system needs to wait before playing sound [in s]:")
         soundDelayLabel['font'] = "Helvetica 12 bold"
-        soundDelayLabel.place(x=self.Xposition, y=self.Yposition, width=600, height=self.heightWidgets)
+        soundDelayLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
         # CHOOSE NOTIFY COLOR SECTION --------------------------------
 
@@ -223,7 +226,7 @@ class configFrame:
 
         colorModeLabel = Label(self.frameDict[x],text="Pick color you want to have as a notification color: ")
         colorModeLabel['font'] = "Helvetica 12 bold"
-        colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=600, height=self.heightWidgets)
+        colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
         # CHOOSE ALERT LANG SECTION --------------------------------
 
@@ -232,7 +235,7 @@ class configFrame:
 
         alertLangLabel = Label(self.frameDict[x], text="Choose your alert language: ")
         alertLangLabel['font'] = "Helvetica 12 bold"
-        alertLangLabel.place(x=self.Xposition, y=self.Yposition, width=600, height=self.heightWidgets)
+        alertLangLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
         # CHOOSE FONT SIZE SECTION --------------------------------
 
@@ -241,7 +244,7 @@ class configFrame:
 
         fontSizeLabel = Label(self.frameDict[x], text="Set size of the text: ")
         fontSizeLabel['font'] = "Helvetica 12 bold"
-        fontSizeLabel.place(x=self.Xposition, y=self.Yposition, width=600, height=self.heightWidgets)
+        fontSizeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
         # CHOOSE FONT FAMILY SECTION -------------------------------
 
@@ -250,12 +253,12 @@ class configFrame:
 
         fontFamilyLabel = Label(self.frameDict[x], text="Choose Font for your OS: ")
         fontFamilyLabel['font'] = "Helvetica 12 bold"
-        fontFamilyLabel.place(x=self.Xposition, y=self.Yposition, width=600, height=self.heightWidgets)
+        fontFamilyLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
         self.Xposition = self.width / 2
         self.Yposition = self.Yposition + self.heightWidgets + 100
         restore = Button(self.frameDict[x], text="RESTORE TO DEFAULT SETTINGS")
-        restore.place(x=self.Xposition, y=self.Yposition, width=200, height=self.heightWidgets)
+        restore.place(x=self.Xposition, y=self.Yposition, width=self.width/7, height=self.heightWidgets)
         restore['command'] = lambda : [radioVar.set(2), self.restoreGlobalConfigs()]  # restores config to default values and restores also gui visualization
 
     """
