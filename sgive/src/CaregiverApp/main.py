@@ -13,7 +13,6 @@ logging.basicConfig(
 
 if __name__ == '__main__':
     ryuconf.caregiverAppConfig()
-    ryuconf.editConfig("GlobalConfiguration", "colorMode", "CHANGED VALUE -------")
     root = Tk()
     ryuGUI.AppBase(root)
     root.mainloop()

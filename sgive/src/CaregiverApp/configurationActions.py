@@ -51,6 +51,8 @@ def editConfig(key, name, value):
         data[key][name] = value
     with open('data.json', 'w') as f:
         json.dump(data, f, indent=4)
+    logging.info(f'successfully edited value: "{value}" at key: "{name}".')
+
 
 def getMac():
     mac = gmac()
@@ -61,12 +63,12 @@ def caregiverAppConfig():
     options = ["Global\nconfig", "Mail\nconfig", "Web\nconfig", "LOGS"]
     dictionary = {
         'GlobalConfiguration': {
-            "language": "czech",
+            "language": "english",
             "colorMode": "colorfull",
             "soundDelay": 5,
             "alertColor": "green",
             "alertSoundLanguage": "czech",
-            "fontSize": "36",
+            "fontSize": 36,
             "fontFamily": "someCoolName",
             "macAddress": getMac(),
         },
