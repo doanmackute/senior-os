@@ -33,4 +33,4 @@ Caregiver app
 
 ## Call for bachelor's and master's theses
 
-Titles and text are [here](https://github.com/forsenior/senior-os/blob/main/theses/theses.md) (in Czech)
+Titles and text are [here](https://github.com/forsenior/senior-os/tree/main/theses) (in Czech)
