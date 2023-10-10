@@ -1,21 +1,36 @@
-# SeniorOS - Operating system for late elderly users
+# SeniorOS - Operating system for late elderly and cognitive challenged users
 
-The system is **under development** and the code is to be used only by the **students** at Brno University of Technology.
+The system is **under development** and the code is to be used only by the **students** at Brno University of Technology
 
-- Idea is to create an operating system that would be suitable for individuals aged 90+ and those with mental impairments
-- These users often face challenges when using common desktop systems and require assistance from their caregivers or family members
-- Currently, there is no existing system tailored specifically to meet their needs
+- The idea is to develop an operating system suitable for individuals aged 90+ and those with cognitive challenges
+- These users encounter difficulties when using common desktop systems and require assistance from their caregivers
+- Late elderly and cognitive challenged users are easy targets for cyber criminals
  
-Developed by students at Brno University of Technology via their bachelor’s and master’s theses. Information [Dan Komosny](https://www.vut.cz/en/people/dan-komosny-3065).
+The operating system is built on top of a Linux distribution; it contains an email client, web browser, and caregiver application 
 
-## Description
+Developed by students via their bachelor’s and master’s theses; supervised by [Dan Komosny](https://www.vut.cz/en/people/dan-komosny-3065)
 
-The operating system is built on top of a Linux distribution. It contains an application launcher and three applications: email client, web browser, and text editor. 
+## Features in development
+ 
+- Easy navigation via non-changing layout
 
-- Applications are designed to be user-friendly for seniors and mentally impaired users, with built-in cooperation with their assistant
-- Applications also protects users from security risks, as seniors and mentally impaired users are often easy targets
-- Operating system is available on a USB stick, allowing users to have the same environment everywhere
+- Available as live ISO for USB sticks
+
+- Caregiver warning of security problems
+
+- Sounds for users with hearing difficulties
+
+- Fine motor skills log for medical evaluations
+
+## Working examples
+
+Web browser
+
+Email client
+
+Caregiver app
+
 
 ## Call for bachelor's and master's theses
 
-Titles and text are [here](https://github.com/komosny/Senior-Operating-System/blob/main/documents/zadani.md) (in Czech)
+Titles and text are [here](https://github.com/forsenior/senior-os/blob/main/theses/theses.md) (in Czech)
