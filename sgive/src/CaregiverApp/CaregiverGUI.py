@@ -2,7 +2,6 @@ from tkinter import *
 import configurationActions as ryuconf
 from screeninfo import get_monitors
 from configurationActions import readFile
-from getmac import get_mac_address as gmac
 import logging
 
 logger = logging.getLogger(__file__)
@@ -21,7 +20,7 @@ class menuBarButtons:
         self.buttonDictionary = {}
         # calls section
         self.buttons()
-        self.callOPT = optFrame(self.root, self.width, self.height)
+        self.callOPT = configFrame(self.root, self.width, self.height)
 
     def buttons(self):
         counter = 0
@@ -60,7 +59,7 @@ class menuBarButtons:
         logger.info("created buttons")
 
 
-class optFrame:
+class configFrame:
     def __init__(self, root: Tk, width: int, height: int):
         self.width = width
         self.height = height
@@ -68,6 +67,7 @@ class optFrame:
         self.heightDivisor = 7
         self.numberOfFrames = 4
         self.whichFrameIsON = None
+        self.configFrameHeight = self.height - (self.height / self.heightDivisor)
         self.langaugeOPT = ('Czech', 'English', 'Deutsch')
         self.frameDict = {}
         self.createFrame()
@@ -75,11 +75,11 @@ class optFrame:
     """
     Defs that are used later:
     """
+
     def refreshLogFrame(self, x):
         for widgets in self.frameDict[x].winfo_children():
             widgets.destroy()
         self.viewLogs(x)
-
 
     """
     Creating base frame for all of the options:
@@ -89,9 +89,10 @@ class optFrame:
         valueOfI = 0
         while valueOfI <= self.numberOfFrames:
             self.frameDict[valueOfI] = Frame(self.root)
+            self.frameDict[valueOfI].pack_propagate(False)
             self.frameDict[valueOfI]['bg'] = "#1e1f22"
             self.frameDict[valueOfI]['width'] = self.width
-            self.frameDict[valueOfI]['height'] = self.height - (self.height / self.heightDivisor)
+            self.frameDict[valueOfI]['height'] = self.configFrameHeight
             valueOfI += 1
 
     """
@@ -110,7 +111,7 @@ class optFrame:
             self.whichFrameIsON = x
             self.frameDict[x].pack()
         # some setup
-        B = Button(self.frameDict[x], text="REFRESH", command= lambda : self.refreshLogFrame(x))
+        B = Button(self.frameDict[x], text="REFRESH", command=lambda: self.refreshLogFrame(x))
         B.pack(side=TOP)
         textThing = Text(self.frameDict[x], height=self.height - (self.height / 7),
                          width=self.width,
@@ -123,7 +124,6 @@ class optFrame:
         for f in file:
             textThing.insert(END, f)
         textThing.config(state=DISABLED)  # disable editing
-        logger.info("opened logs frame")
 
     def globalConfig(self, x):
         if not self.whichFrameIsON is None and self.whichFrameIsON != x:
@@ -134,12 +134,42 @@ class optFrame:
             self.whichFrameIsON = x
             self.frameDict[x].pack()
 
-        # use checkButton widgets
-        # figure out way how to get values to config.json
-        var = StringVar(self.frameDict[x])
-        var.set(self.langaugeOPT[0])
-        option = OptionMenu(self.frameDict[x], var, *self.langaugeOPT)
-        option.pack()
+        var = StringVar()
+        label = Label(self.frameDict[x], textvariable=var, relief=RAISED)
+        var.set("Pick language: (default: English)")
+        label['font'] = "Helvetica 12 bold"
+        label.place(x=0, y=10, width=600, height=100)
+
+        options = ["Czech", "English", "German"]
+        dictionary = {}
+        counter = 1
+        var = IntVar()
+        self.pickedButton = None
+        width = 200
+        height = 100
+        iks = 610
+        y = 10
+
+        def changeColor(var):
+            if not self.pickedButton is None:
+                dictionary[self.pickedButton].configure(bg="#D3D3D3", activebackground="#D3D3D3")
+                dictionary[var].configure(bg="green", activebackground="green")
+                self.pickedButton = var
+            else:
+                dictionary[var].configure(bg="green", activebackground="green")
+                self.pickedButton = var
+
+        for opt in options:
+            dictionary[counter] = Radiobutton(self.frameDict[x], text=opt, variable=var, value=counter)
+            dictionary[counter]['font'] = "Helvetica 12 bold"
+            dictionary[counter].configure(bg="#D3D3D3", activebackground="#D3D3D3")
+            dictionary[counter]['command'] = lambda: changeColor(var.get())
+            if counter == 1:
+                dictionary[counter].place(x=iks, y=y, width=width, height=height)
+            else:
+                iks = iks + width + 10  # 5 is here for some space
+                dictionary[counter].place(x=iks, y=y, width=width, height=height)
+            counter += 1
         logger.info("opened global config frame")
 
     def mailConfig(self, x):
