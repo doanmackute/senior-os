@@ -1,7 +1,7 @@
 import logging
 import json
 import pygame
-from tkinter import ttk, PhotoImage
+from tkinter import ttk
 import PIL
 from PIL import Image, ImageTk
 
@@ -25,6 +25,16 @@ def button_config():
     style.configure("my.TButton", font=font_info)
 
     return "my.TButton"
+
+def app_color():
+    try:
+        with open("../sconf/config.json", "r") as f:
+            config = json.loads(f.read())
+            bg = config["colors_info"]["app_frame"]
+        f.close()
+        return bg
+    except Exception:
+        logger.error("Couldn't read application color, file is missing.", exc_info=True)
 
 
 def images():

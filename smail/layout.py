@@ -1,10 +1,13 @@
 import logging
+import threading
 import tkinter as tk
 from tkinter import scrolledtext
 from smail.config.style import (font_config, search_mail,
-                                getLanguage, button_hover, button_leave)
+                                getLanguage, button_hover, button_leave, images, imageConfig, app_color)
 from smail.config.mail_connection import sendEmail, readMail, checkEmailForSpam
-from smail.template import guiTemplate as temp
+from demo.guiTemplate import guiTemplate as temp
+from demo.guiTemplate import configActions as act
+import time
 
 logger = logging.getLogger(__file__)
 
@@ -12,13 +15,22 @@ logger = logging.getLogger(__file__)
 class oneFrame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
+
+        # background color
+        self.background_color = app_color()
+        self.configure(bg=self.background_color)
+
         # initiate logging
         logger.info("Initiated logging.")
         self.menu = temp.App(parent)
+
         # import buttons from GUI template
         self.redefineTemplateButtons()
         self.button_state = None
-        self.language, self.text = getLanguage()
+
+        height = temp.resolutionMath()[2]
+        print(height)
+
         # grid configuration
         self.columnconfigure(0, weight=1, uniform="a")
         self.columnconfigure(1, weight=3, uniform="a")
@@ -33,51 +45,127 @@ class oneFrame(tk.Frame):
         )
         self.pack()
 
+        # Start a background thread to load emails
+        self.loadingEmails = threading.Thread(target=self.loadEmails)
+        self.loadingEmails.start()
+
+    def loadEmails(self):
+        self.insertEmails()
+
     def redefineTemplateButtons(self):
         try:
+            # width configuration
+            self.sixHeight = temp.resolutionMath()[2]
+            self.sixWidth = temp.resolutionMath()[1]
+            numOPT = act.jsonRed('buttons_info', "num_of_opt_on_frame")
+            padxValue = act.jsonRed('buttons_info', "padx_value")
+            self.buttonWidth = int(self.sixWidth - (padxValue * numOPT))
+
+            # language configuration
+            self.language, self.text = getLanguage()
+
+            # image configuration
+            self.img = images()
+            self.exitImage = tk.PhotoImage(file=self.img["exit"])
+            self.person1Image = imageConfig("Person1", self.sixHeight)
+            self.person2Image = imageConfig("Person2", self.sixHeight)
+            self.person3Image = imageConfig("Person3", self.sixHeight)
+            self.person4Image = imageConfig("Person4", self.sixHeight)
+            self.person5Image = imageConfig("Person5", self.sixHeight)
+        except Exception:
+            logger.error("Failed loading language and images")
+
+        try:
+            # access menu 1
             self.options_buttons_crt1 = (
                 self.menu.menuFrameCreateButtonsVal.optButtons1
             )
+
+            # access menu 2
             self.options_buttons_crt2 = (
                 self.menu.menuFrameCreateButtonsVal.optButtons2
             )
+
+            # option menu frame
+            self.opt_menu = self.menu.menuFrameTempVal.configure(bg=self.background_color)
+
+            self.menu_button_1 = self.menu.menuFrameCreateButtonsVal.button_dict[1]
+            self.menu_button_1.configure(bg = self.background_color)
+
+            # saving buttons to local variables
             self.exitButton = self.options_buttons_crt1.button_dict[1]
-            self.audioConfigure(self.exitButton, "exitButton")
-            # self.sendEmailButton = self.options_buttons_crt1.button_dict[2]
-            # self.audioConfigure(self.sendEmailButton, "sendEmailButton")
+            self.sendEmailButton = self.options_buttons_crt1.button_dict[2]
             self.sendMailPerson1 = self.options_buttons_crt1.button_dict[3]
-            self.audioConfigure(self.sendMailPerson1, "person1")
             self.sendMailPerson2 = self.options_buttons_crt1.button_dict[4]
-            self.audioConfigure(self.sendMailPerson2, "person2")
             self.sendMailPerson3 = self.options_buttons_crt2.button_dict[1]
-            self.audioConfigure(self.sendMailPerson3, "person3")
             self.sendMailPerson4 = self.options_buttons_crt2.button_dict[2]
-            self.audioConfigure(self.sendMailPerson4, "person4")
             self.sendMailPerson5 = self.options_buttons_crt2.button_dict[3]
-            self.audioConfigure(self.sendMailPerson5, "person5")
             self.sendMailTo = self.options_buttons_crt2.button_dict[4]
+
+            # audio configuration
+            self.audioConfigure(self.exitButton, "exitButton")
+            self.audioConfigure(self.sendEmailButton, "sendEmailButton")
+            self.audioConfigure(self.sendMailPerson1, "person1")
+            self.audioConfigure(self.sendMailPerson2, "person2")
+            self.audioConfigure(self.sendMailPerson3, "person3")
+            self.audioConfigure(self.sendMailPerson4, "person4")
+            self.audioConfigure(self.sendMailPerson5, "person5")
             self.audioConfigure(self.sendMailTo, "sendToButton")
 
-            # self.sendEmailButton.config(
-            #     command=self.sendMail,
-            # )
+            self.exitButton.config(
+                image=self.exitImage,
+                text="",
+                width=self.buttonWidth,
+                bg=self.background_color
+
+            )
+            self.sendEmailButton.config(
+                text = "",
+                width=self.buttonWidth,
+                bg=self.background_color
+
+                # command=self.sendMail,
+            )
             self.sendMailPerson1.config(
                 command=lambda: self.fillRecipient(1),
+                image=self.person1Image,
+                text="",
+                width=self.buttonWidth,
+                bg=self.background_color
             )
             self.sendMailPerson2.config(
                 command=lambda: self.fillRecipient(2),
+                image=self.person2Image,
+                text="",
+                width=self.buttonWidth,
+                bg=self.background_color
             )
             self.sendMailPerson3.config(
                 command=lambda: self.fillRecipient(3),
+                image=self.person3Image,
+                text="",
+                width=self.buttonWidth,
+                bg=self.background_color
             )
             self.sendMailPerson4.config(
                 command=lambda: self.fillRecipient(4),
+                image=self.person4Image,
+                text="",
+                width=self.buttonWidth,
+                bg=self.background_color
             )
             self.sendMailPerson5.config(
                 command=lambda: self.fillRecipient(5),
+                image=self.person5Image,
+                text="",
+                width=self.buttonWidth,
+                bg=self.background_color
             )
             self.sendMailTo.config(
                 command=lambda: self.fillRecipient(0),
+                text=self.text[f"smail_{self.language}_sendToButton"],
+                width=self.buttonWidth,
+                bg=self.background_color
             )
             logger.info("Buttons successfully redefined.")
         except AttributeError:
@@ -88,12 +176,14 @@ class oneFrame(tk.Frame):
             logger.error("Error:", exc_info=True)
 
     def leftFrame(self):
+
         self.frame = tk.Frame(self)
+        self.frame.configure(bg=self.background_color)
         self.frame.columnconfigure(0, weight=1, uniform="a")
         self.frame.rowconfigure(0, weight=1, uniform="a")
         self.inboxLabel = tk.Label(
             self.frame, text=self.text[f"smail_{self.language}_inboxLabel"],
-            font=font_config()
+            font=font_config(), bg=self.background_color
         )
         self.inboxList = tk.Listbox(
             self.frame, font=font_config(), height=13, width=40,
@@ -107,30 +197,32 @@ class oneFrame(tk.Frame):
             row=1, column=0,
             sticky="nsew", padx=20, pady=20
         )
-        self.insertEmails()
+
+
 
         logger.info("Created left frame with received emails in listbox.")
         return self.frame
 
     def rightWriteFrame(self):
         self.rwframe = tk.Frame(self)
+        self.rwframe.configure(bg=self.background_color)
         self.rwframe.columnconfigure((0, 1), weight=1, uniform="a")
         self.rwframe.rowconfigure((0, 1, 2, 4), weight=1, uniform="a")
         self.rwframe.rowconfigure(3, weight=2, uniform="a")
         self.recipientLabel = tk.Label(
             self.rwframe,
             text=self.text[f"smail_{self.language}_recipientLabel"],
-            font=font_config()
+            font=font_config(), bg=self.background_color
         )
         self.subjectLabel = tk.Label(
             self.rwframe,
             text=self.text[f"smail_{self.language}_subjectLabel"],
-            font=font_config()
+            font=font_config(), bg=self.background_color
         )
         self.contentLabel = tk.Label(
             self.rwframe,
             text=self.text[f"smail_{self.language}_messageLabel"],
-            font=font_config()
+            font=font_config(), background=self.background_color
         )
         self.recipientEntry = tk.Entry(
             self.rwframe, font=font_config()
@@ -171,12 +263,13 @@ class oneFrame(tk.Frame):
 
     def rightReadFrame(self):
         self.rrframe = tk.Frame(self)
+        self.rrframe.configure(bg=self.background_color)
         self.rrframe.columnconfigure(0, weight=2, uniform="a")
         self.rrframe.rowconfigure(0, weight=1, uniform="a")
         self.messageLabel = tk.Label(
             self.rrframe,
             text=self.text[f"smail_{self.language}_messageLabel"],
-            font=font_config()
+            font=font_config(), bg=self.background_color
         )
         self.messageArea = scrolledtext.ScrolledText(
             self.rrframe, font=font_config(), height=13

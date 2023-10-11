@@ -1,6 +1,6 @@
 import logging
 import tkinter
-from smail.template import configActions as act
+from demo.guiTemplate import configActions as act
 from smail.layout import oneFrame
 
 logging.basicConfig(
@@ -16,8 +16,11 @@ if __name__ == '__main__':
     isExist = act.configExistCheck(_currentVersionOfConfig)
     if isExist:
         root = tkinter.Tk()
+        root.configure(bg="#FFFFFF")
         app = oneFrame(root)
         root.mainloop()
+
+
     else:
         logging.critical("Could not start smail app. "
                          "Check the configuration file.")
