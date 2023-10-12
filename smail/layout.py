@@ -2,12 +2,11 @@ import logging
 import threading
 import tkinter as tk
 from tkinter import scrolledtext
-from smail.config.style import (font_config, search_mail,
-                                getLanguage, button_hover, button_leave, images, imageConfig, app_color)
-from smail.config.mail_connection import sendEmail, readMail, checkEmailForSpam
+from smail.connection.style import (font_config, search_mail,
+                                    getLanguage, button_hover, button_leave, images, imageConfig, app_color, height_config)
+from smail.connection.mail_connection import sendEmail, readMail, checkEmailForSpam
 from demo.guiTemplate import guiTemplate as temp
 from demo.guiTemplate import configActions as act
-import time
 
 logger = logging.getLogger(__file__)
 
@@ -28,8 +27,8 @@ class oneFrame(tk.Frame):
         self.redefineTemplateButtons()
         self.button_state = None
 
-        height = temp.resolutionMath()[2]
-        print(height)
+        # number of displayed lines in textarea and listbox
+        self.number_of_lines_listbox, self.number_of_lines_textarea = height_config(self)
 
         # grid configuration
         self.columnconfigure(0, weight=1, uniform="a")
@@ -86,12 +85,6 @@ class oneFrame(tk.Frame):
                 self.menu.menuFrameCreateButtonsVal.optButtons2
             )
 
-            # option menu frame
-            self.opt_menu = self.menu.menuFrameTempVal.configure(bg=self.background_color)
-
-            self.menu_button_1 = self.menu.menuFrameCreateButtonsVal.button_dict[1]
-            self.menu_button_1.configure(bg = self.background_color)
-
             # saving buttons to local variables
             self.exitButton = self.options_buttons_crt1.button_dict[1]
             self.sendEmailButton = self.options_buttons_crt1.button_dict[2]
@@ -101,8 +94,10 @@ class oneFrame(tk.Frame):
             self.sendMailPerson4 = self.options_buttons_crt2.button_dict[2]
             self.sendMailPerson5 = self.options_buttons_crt2.button_dict[3]
             self.sendMailTo = self.options_buttons_crt2.button_dict[4]
+            self.menu_button_1 = self.menu.menuFrameCreateButtonsVal.button_dict[1]
+            self.menu_button_2 = self.menu.menuFrameCreateButtonsVal.button_dict[2]
 
-            # audio configuration
+            # audio configuration buttons
             self.audioConfigure(self.exitButton, "exitButton")
             self.audioConfigure(self.sendEmailButton, "sendEmailButton")
             self.audioConfigure(self.sendMailPerson1, "person1")
@@ -111,18 +106,18 @@ class oneFrame(tk.Frame):
             self.audioConfigure(self.sendMailPerson4, "person4")
             self.audioConfigure(self.sendMailPerson5, "person5")
             self.audioConfigure(self.sendMailTo, "sendToButton")
+            self.audioConfigure(self.menu_button_1, "menu1")
+            self.audioConfigure(self.menu_button_2, "menu2")
 
             self.exitButton.config(
                 image=self.exitImage,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.buttonWidth
 
             )
             self.sendEmailButton.config(
                 text = "",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.buttonWidth
 
                 # command=self.sendMail,
             )
@@ -130,42 +125,36 @@ class oneFrame(tk.Frame):
                 command=lambda: self.fillRecipient(1),
                 image=self.person1Image,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.buttonWidth
             )
             self.sendMailPerson2.config(
                 command=lambda: self.fillRecipient(2),
                 image=self.person2Image,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.buttonWidth
             )
             self.sendMailPerson3.config(
                 command=lambda: self.fillRecipient(3),
                 image=self.person3Image,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.buttonWidth
             )
             self.sendMailPerson4.config(
                 command=lambda: self.fillRecipient(4),
                 image=self.person4Image,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.buttonWidth
             )
             self.sendMailPerson5.config(
                 command=lambda: self.fillRecipient(5),
                 image=self.person5Image,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.buttonWidth
             )
             self.sendMailTo.config(
                 command=lambda: self.fillRecipient(0),
                 text=self.text[f"smail_{self.language}_sendToButton"],
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.buttonWidth
             )
             logger.info("Buttons successfully redefined.")
         except AttributeError:
@@ -186,7 +175,7 @@ class oneFrame(tk.Frame):
             font=font_config(), bg=self.background_color
         )
         self.inboxList = tk.Listbox(
-            self.frame, font=font_config(), height=13, width=40,
+            self.frame, font=font_config(), height=self.number_of_lines_listbox,
             activestyle="none", selectmode=tk.SINGLE
         )
         self.inboxLabel.grid(
@@ -198,7 +187,7 @@ class oneFrame(tk.Frame):
             sticky="nsew", padx=20, pady=20
         )
 
-
+        self.audioConfigure(self.inboxList, "inbox")
 
         logger.info("Created left frame with received emails in listbox.")
         return self.frame
@@ -231,8 +220,14 @@ class oneFrame(tk.Frame):
             self.rwframe, font=font_config()
         )
         self.contentEntry = scrolledtext.ScrolledText(
-            self.rwframe, font=font_config(), height=10
+            self.rwframe, font=font_config(), height=self.number_of_lines_textarea
         )
+
+        # audio configuration
+        self.audioConfigure(self.recipientEntry,"recipient")
+        self.audioConfigure(self.subjectEntry, "subject")
+        self.audioConfigure(self.contentEntry, "write_message")
+
         # widget placement
         self.recipientLabel.grid(
             row=0, column=0,
@@ -272,8 +267,14 @@ class oneFrame(tk.Frame):
             font=font_config(), bg=self.background_color
         )
         self.messageArea = scrolledtext.ScrolledText(
-            self.rrframe, font=font_config(), height=13
+            self.rrframe, font=font_config(), height=self.number_of_lines_listbox
         )
+
+        # audio configuration
+        self.audioConfigure(self.messageArea, "read_message")
+
+
+        # grid configuration
         self.messageLabel.grid(
             row=0, column=0, ipady=5,
             sticky="nsew", padx=10, pady=10

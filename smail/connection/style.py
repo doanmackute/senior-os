@@ -4,6 +4,7 @@ import pygame
 from tkinter import ttk
 import PIL
 from PIL import Image, ImageTk
+from demo.guiTemplate.guiTemplate import resolutionMath
 
 logger = logging.getLogger(__file__)
 
@@ -39,38 +40,38 @@ def app_color():
 
 def images():
     try:
-        with open("config/email_address_config.json", "r") as f:
+        with open("../sconf/SMAIL_config.json", "r") as f:
             data = json.loads(f.read())
             images = data["images"]
         f.close()
         return images
     except Exception:
-        logger.error("Couldn't find email_address_config.json", exc_info=True)
+        logger.error("Couldn't find SMAIL_config.json", exc_info=True)
 
 
 
 def search_mail(id):
     try:
-        with open("config/email_address_config.json", "r") as f:
+        with open("../sconf/SMAIL_config.json", "r") as f:
             data = json.loads(f.read())
             emails = data["emails"]
             email = emails[f"Person{id}"]
         f.close()
         return email
     except Exception:
-        logger.error("Couldn't find email_address_config.json", exc_info=True)
+        logger.error("Couldn't find SMAIL_config.json", exc_info=True)
 
 
 def getLanguage():
     try:
-        with open("config/translate.json") as f:
-            translate = json.loads(f.read())
-            language = translate["lang"]
-            text = translate["text"]
+        with open("../sconf/SMAIL_config.json") as f:
+            data = json.loads(f.read())
+            language = data["lang"]
+            text = data["text"]
         f.close()
         return language, text
     except Exception:
-        logger.error("Couldn't locate translation file: translate.json",
+        logger.error("Couldn't find SMAIL_config.json",
                      exc_info=True)
 
 
@@ -78,15 +79,15 @@ def getLanguage():
 def getAudio():
     # reads configuration from json file
     try:
-        with open("config/translate.json") as f:
-            translate = json.loads(f.read())
-            language = translate["lang"]
-            audio = translate["audio"]
-            timer = translate["timer"]
+        with open("../sconf/SMAIL_config.json") as f:
+            data = json.loads(f.read())
+            language = data["lang"]
+            audio = data["audio"]
+            timer = data["timer"]
         f.close()
         return language, audio, timer
     except Exception:
-        logger.error("Couldn't locate translation file: translate.json",
+        logger.error("Couldn't find SMAIL_config.json",
                      exc_info=True)
 
 
@@ -124,3 +125,23 @@ def imageConfig(name, btn_height):
     resized_image = original_image.resize((int(original_image.width * height_ratio), new_height), PIL.Image.LANCZOS)
     image = ImageTk.PhotoImage(resized_image)
     return image
+
+def height_config(parent):
+
+    font_base = font_config()
+
+    # pt to pixels
+    font = font_base.split(" ")
+    font_size = int(font[1])
+    font_size_in_pixels = font_size / 0.75
+
+    # resolution info
+    parent_height = parent.winfo_screenheight()
+    area_of_upper_widget = resolutionMath()[2]
+    usable_height = parent_height - area_of_upper_widget
+
+    # calculating widget height
+    number_of_lines_listbox = int((usable_height - font_size_in_pixels * 3) / font_size_in_pixels)
+    number_of_lines_textarea = int((usable_height - font_size_in_pixels * 6) / font_size_in_pixels)
+
+    return number_of_lines_listbox, number_of_lines_textarea

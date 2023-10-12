@@ -11,7 +11,7 @@ import ssl
 import re
 
 
-# connection to the smtp/imap server and other information are taken from
+# config to the smtp/imap server and other information are taken from
 # credentials.json file, in order to be able to connect to the gmail mailbox,
 # it is necessary to enter the email address and password for the application
 # (password needs to be generated in google account via:
@@ -19,8 +19,9 @@ import re
 
 try:
     # reading credentials from json file
-    with open("config/credentials.json", "r") as f:
-        credentials = json.loads(f.read())
+    with open("../sconf/SMAIL_config.json", "r") as f:
+        data = json.loads(f.read())
+        credentials = data["credentials"]
         login = credentials["username"]
         password = credentials["password"]
         smtp_server = credentials["smtp_server"]
@@ -64,7 +65,7 @@ def readMail():
             imap_server, imap_port, ssl_context=sslContext
         )
         mail.login(login, password)
-        logger.info("Successful connection to IMAP server.")
+        logger.info("Successful config to IMAP server.")
 
         # selecting folder from which to read e-mails
         mail.select("INBOX")
