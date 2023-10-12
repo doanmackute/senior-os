@@ -74,7 +74,7 @@ class configFrame:
         self.createFrame()
         self._isGlobalConfigRunning = False
         # change language things:
-        self.widthLabel = self.width / 2.8
+        self.widthLabel = self.width / 2.2
         self.widthButton = 200
         self.Xposition = 0
         self.Yposition = 10
@@ -174,11 +174,14 @@ class configFrame:
             return
 
         self._isGlobalConfigRunning = True # "single instance lock"
+        # start from x = 0 and y = 30 of the application frame
+        self.Xposition = 0
+        self.Yposition = 30
 
         # CHOOSE LANGUAGE SECTION --------------------------------
 
         languageLabel = Label(self.frameDict[x],text="Please, choose which language you want this OS to be:")
-        languageLabel['font'] = "Helvetica 12 bold"
+        languageLabel['font'] = "Helvetica 12 bold"  # TODO: read from config.json
         languageLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
         self.Xposition = self.Xposition + self.widthLabel + 10
@@ -255,11 +258,12 @@ class configFrame:
         fontFamilyLabel['font'] = "Helvetica 12 bold"
         fontFamilyLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
-        self.Xposition = self.width / 2
+        self.Xposition = (self.width / 2) - ((self.width/5)/2)
         self.Yposition = self.Yposition + self.heightWidgets + 100
         restore = Button(self.frameDict[x], text="RESTORE TO DEFAULT SETTINGS")
-        restore.place(x=self.Xposition, y=self.Yposition, width=self.width/7, height=self.heightWidgets)
-        restore['command'] = lambda : [radioVar.set(2), self.restoreGlobalConfigs()]  # restores config to default values and restores also gui visualization
+        restore.place(x=self.Xposition, y=self.Yposition, width=self.width/5, height=self.heightWidgets)
+        restore['command'] = lambda : [radioVar.set(2), self.restoreGlobalConfigs(), logger.info("resetting config")]
+        # restores config to default values and restores also gui visualization
 
     """
     MAIL CONFIG: -------------------------------------------------------------------------------------------------------
