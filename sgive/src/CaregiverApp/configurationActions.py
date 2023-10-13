@@ -61,15 +61,18 @@ def getMac():
 
 def caregiverAppConfig():
     options = ["Global\nconfig", "Mail\nconfig", "Web\nconfig", "LOGS"]
+    languageOPT = ["Czech", "English", "German"]
     dictionary = {
         'GlobalConfiguration': {
             "language": "english",
-            "colorMode": "colorfull",
+            "colorMode": "white",
             "soundDelay": 5,
-            "alertColor": "green",
-            "alertSoundLanguage": "czech",
+            "alertColor": "#AAFF00",
+            "alertSoundLanguage": "english",
             "fontSize": 36,
-            "fontFamily": "someCoolName",
+            "labelFontSize": 12,
+            "fontThickness": "bold",
+            "fontFamily": "Helvetica",
             "macAddress": getMac(),
         },
         'smail': {
@@ -88,7 +91,9 @@ def caregiverAppConfig():
             "fg": 5,
             "bg": 5,
             "heightDivisor": 7,
-            "menuButtonsList": options.copy()
+            "menuButtonsList": options.copy(),
+            "LanguageOptions": languageOPT.copy()
+
         },
     }
     json_object = json.dumps(dictionary, indent=4)
