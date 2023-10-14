@@ -1,1 +1,1 @@
-Email client for seniors
+Email client for seniors.
