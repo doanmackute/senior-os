@@ -1,11 +1,11 @@
 import logging
 import tkinter
 from demo.guiTemplate import configActions as act
-from smail.layout import oneFrame
+from smail.layout import one_frame
 
 logging.basicConfig(
      level=logging.INFO,
-     filename="SMAILlog.log",
+     filename="../sconf/SMAILlog.log",
      filemode="w",
      format="%(asctime)s:SMAIL-%(levelname)s-%(funcName)s: %(message)s",
      datefmt="%b %d %H:%M:%S",
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     if isExist:
         root = tkinter.Tk()
         root.configure(bg="#FFFFFF")
-        app = oneFrame(root)
+        app = one_frame(root)
         root.mainloop()
 
 

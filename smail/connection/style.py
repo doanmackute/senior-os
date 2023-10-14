@@ -62,7 +62,7 @@ def search_mail(id):
         logger.error("Couldn't find SMAIL_config.json", exc_info=True)
 
 
-def getLanguage():
+def get_language():
     try:
         with open("../sconf/SMAIL_config.json") as f:
             data = json.loads(f.read())
@@ -76,7 +76,7 @@ def getLanguage():
 
 
 # audio session
-def getAudio():
+def get_audio():
     # reads configuration from json file
     try:
         with open("../sconf/SMAIL_config.json") as f:
@@ -93,7 +93,7 @@ def getAudio():
 
 def play_sound(button_name):
     pygame.mixer.init()
-    language, audio, timer = getAudio()
+    language, audio, timer = get_audio()
     # Loads the audio file corresponding to the button_name.
     pygame.mixer.music.load(audio[f"smail_{language}_{button_name}"])
     # Plays the loaded audio.
@@ -102,7 +102,7 @@ def play_sound(button_name):
 
 def button_hover(button, button_name, enter_time):
     # Function is called when the mouse cursor hovers over a button.
-    language, audio, timer = getAudio()
+    language, audio, timer = get_audio()
     # It schedules playing sound after a specified time delay.
     # It stores the scheduled time event ID in enter_time[0].
     enter_time[0] = button.after(timer, lambda: play_sound(button_name))
@@ -116,7 +116,7 @@ def button_leave(button, enter_time):
     if enter_time[0]:
         button.after_cancel(enter_time[0])
 
-def imageConfig(name, btn_height):
+def image_config(name, btn_height):
     data = images()
     path = data[name]
     original_image = Image.open(path)

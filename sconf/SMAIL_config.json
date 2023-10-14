@@ -5,11 +5,12 @@
         "smtp_server": "smtp.gmail.com",
         "smtp_port": 465,
         "imap_server": "imap.gmail.com",
-        "imap_port": 993
+        "imap_port": 993,
+        "max": 20
     },
 
     "emails":{
-        "Person1": "komosny@vut.cz",
+        "Person1": "email1@gmail.com",
         "Person2": "email2@gmail.com",
         "Person3": "241124@vutbr.cz",
         "Person4": "email4@gmail.com",

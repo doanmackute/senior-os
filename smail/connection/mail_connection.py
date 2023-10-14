@@ -28,6 +28,7 @@ try:
         smtp_port = credentials["smtp_port"]
         imap_server = credentials["imap_server"]
         imap_port = credentials["imap_port"]
+        max_emails = credentials["max"]
     f.close()
     sslContext = ssl.create_default_context()
     logger.info("Email Credentials read successfully.")
@@ -37,7 +38,7 @@ except Exception:
 
 
 
-def sendEmail(recipient, subject, content):
+def send_email(recipient, subject, content):
 
     msg = MIMEText(content)
     msg['Subject'] = subject
@@ -50,6 +51,7 @@ def sendEmail(recipient, subject, content):
         ) as server:
             server.login(login, password)
             server.sendmail(login, recipient, msg.as_string())
+        logger.warning(f"An email has been sent to {recipient}")
         return 1
 
     except Exception as error:
@@ -58,50 +60,48 @@ def sendEmail(recipient, subject, content):
         return error
 
 
-def readMail():
+def read_mail():
 
     try:
         mail = imaplib.IMAP4_SSL(
             imap_server, imap_port, ssl_context=sslContext
         )
+
         mail.login(login, password)
-        logger.info("Successful config to IMAP server.")
+        logger.info("Successful connection to IMAP server.")
 
         # selecting folder from which to read e-mails
         mail.select("INBOX")
 
         _, selected_mails = mail.search(None, 'ALL')
+        email_ids = selected_mails[0].split()
 
         emails = []
+        max_emails = 20
 
-        for num in selected_mails[0].split():
-            _, data = mail.fetch(num, '(RFC822)')
+        for email_id in email_ids[:max_emails]:
+            _, data = mail.fetch(email_id, '(RFC822)')
             _, bytes_data = data[0]
 
-            # convert the byte data to message
             email_message = email.message_from_bytes(bytes_data)
 
+            subject = email_message['subject']
+            sender = email_message['from']
+            date = email_message['date']
+
             for part in email_message.walk():
-                if (part.get_content_type() == "text/plain"
-                        or part.get_content_type() == "text/html"):
+                if part.get_content_type() in ["text/plain", "text/html"]:
                     message = part.get_payload(decode=True)
-
                     try:
-                        message_deocde = message.decode("utf-8")
+                        message_decode = message.decode("utf-8")
+                    except UnicodeDecodeError:
+                        message_decode = message.decode("latin-1")
 
-                    except Exception as error:
-                        logger.warning(f"trying different formatting for email "
-                                     f"from {email_message['from']};"
-                                    f" error: {error}")
-                        message_deocde = message.decode("latin-1")
-
-                    email_content = ("Subject: " + email_message["subject"]
-                                     + "\nFrom: " + email_message["from"]
-                                     + "\nDate: " + email_message["date"]
-                                     + "\nMessage:\n" + message_deocde)
+                    email_content = f"Subject: {subject}\nFrom: {sender}\nDate: {date}\nMessage:\n{message_decode}"
                     emails.append(email_content)
                     break
-        logger.info("Emails successfully loaded.")
+
+        logger.info(f"{len(emails)} emails successfully loaded")
         return emails
 
     except Exception as error:
@@ -111,7 +111,7 @@ def readMail():
               " check your username and password!", error)
 
 
-def checkCustomDB(email_address):
+def check_custom_db(email_address):
     try:
         with open("antiphishing/custom_email_block.json", "r") as f:
             data = json.loads(f.read())
@@ -121,13 +121,14 @@ def checkCustomDB(email_address):
 
     if email_address in data:
         print(email_address, " is in custom blacklist.")
+        logger.warning(f"received email from blocked address: {email_address}")
         return False
     else:
         print(email_address, " is not in custom blacklist.")
         return True
 
 
-def checkDomainBP(email_address):
+def check_domain_db(email_address):
     try:
         with open("antiphishing/domains.json", "r") as f:
             data = json.loads(f.read())
@@ -139,19 +140,21 @@ def checkDomainBP(email_address):
 
     if email in data:
         print(email_address, " is in database of phishing domains.")
+        logger.warning(f"Received a phishing email from domain: {email}", )
         return False
     else:
         print(email_address, " is not present in the phishing database.")
         return True
 
 
-def checkContentOfEmail(content):
+def check_content_of_email(sender, content):
 
     url_pattern = r"https?://(?:www\.)?\S+|www\.\S+"
     urls = re.findall(url_pattern, content)
 
     if urls:
         print("found urls in email message:")
+        logger.warning(f"Found url in email from {sender}, urls: {urls}")
         for url in urls:
             print(url)
         return False
@@ -160,7 +163,7 @@ def checkContentOfEmail(content):
         return True
 
 
-def checkEmailForSpam(email_messages):
+def check_email_for_spam(email_messages):
 
     with open("antiphishing/permitted_emails.json", "r") as f:
         emails = json.loads(f.read())
@@ -188,22 +191,24 @@ def checkEmailForSpam(email_messages):
         # antiphishing process
         if modified_sender in emails:
             print("Received email from permitted email address.")
-            customBlock = True
-            domainBlock = True
-            contentBlock = True
+            custom_block = True
+            domain_block = True
+            content_block = True
         else:
-            customBlock = checkCustomDB(modified_sender)
-            domainBlock = checkDomainBP(modified_sender)
-            contentBlock = checkContentOfEmail(message)
+            custom_block = check_custom_db(modified_sender)
+            domain_block = check_domain_db(modified_sender)
+            content_block = check_content_of_email(modified_sender, message)
 
-        if customBlock and domainBlock and contentBlock:
+        if custom_block and domain_block and content_block:
             safe_emails.append(email_content)
             print("email address and content of an email are safe"
                   " or are sent by an permitted email address.\n")
         else:
             print("email address found in one of the databases\n")
-            if not contentBlock:
+            if not content_block:
                 print("there is a security vulnerability in message.")
+
+    logger.info(f"Displaying {len(safe_emails)} emails out of {len(email_messages)}.")
 
     print(len(safe_emails))
     return safe_emails
