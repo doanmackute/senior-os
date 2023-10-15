@@ -22,14 +22,28 @@ class menuBarButtons:
         # calls section
         self.buttons()
         self.CallConfigFrame = configurationFramesCreate(self.root, self.height, self.width)
-
+        self.lastSelectedButton = None
         self.pickedButton = None
+
+    def selectedButton(self,x):
+        selectedColor = "#676767"
+        if self.lastSelectedButton is None:
+            self.buttonDictionary[x]['activebackground'] = selectedColor  # selected
+            self.buttonDictionary[x]['bg'] = selectedColor  # selected
+            self.lastSelectedButton = x
+        else:
+            self.buttonDictionary[self.lastSelectedButton]['activebackground'] = "#a8a7a2"  # normal
+            self.buttonDictionary[self.lastSelectedButton]['bg'] = "#C7C6C1"  # normal
+            self.lastSelectedButton = x
+            self.buttonDictionary[x]['activebackground'] = selectedColor  # selected
+            self.buttonDictionary[x]['bg'] = selectedColor  # selected
 
     def buttons(self):
         counter = 0
         self.options.append("EXIT")  # add exit as a last button
         for i in self.options:
             def getButtonNum(y=counter):
+                self.selectedButton(y)
                 if y == 0:
                     self.CallConfigFrame.GlobalConfigCall(y + 1)
                 elif y == 1:
@@ -152,6 +166,8 @@ class configurationFramesCreate:
             self.frameDictionary[x].pack()
 
         showLogConfigFrame(self.frameDictionary[x], self.height, self.width)
+
+
 class showLogConfigFrame:
     def __init__(self, logFrame: Frame, height, width):
         self.height = height
@@ -179,6 +195,7 @@ class showLogConfigFrame:
         for f in file:
             textThing.insert(END, f)
         textThing.config(state=DISABLED)  # disable editing
+
 
 class showGlobalConfigFrame:
     def __init__(self, frame: Frame, width, height):
@@ -223,15 +240,45 @@ class showGlobalConfigFrame:
     """
     OS screen -------------------------------------------------------------------------------------------------------
     """
+
     def OSpickScreen(self):
+        # TODO: dodělat reset, barvu picku a při vícero jak 3 monitorech to spawne label co řekne ať si to člověk edituje přímo v jsonu
         colorModeLabel = Label(self.frame, text="pick Screen: ")
         colorModeLabel['font'] = self.fontGet
         colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
+
+        self.Xposition = self.Xposition + self.widthLabel + 10
+
+        buttonThing = {}
+        buttonDict = []
+        monitors = get_monitors()
+        counter = 0
+        while counter < len(monitors):
+            buttonDict.append(counter)
+            counter += 1
+        self.radioVarScreens = IntVar(value=ryuconf.readJsonConfig("GlobalConfiguration","numOfScreen"))
+        for id in buttonDict:
+            def getNum(i=id):
+                print(i)
+                ryuconf.editConfig("GlobalConfiguration","numOfScreen",i)
+
+            buttonThing[id] = Radiobutton(self.frame, text=f"monitor č.{id+1}", variable=self.radioVarScreens,
+                                          value=id)
+            buttonThing[id]['font'] = self.fontGet
+            buttonThing[id]['command'] = getNum
+            if id == 0:
+                buttonThing[id].place(x=self.Xposition, y=self.Yposition,
+                                      width=self.widthButton, height=self.heightWidgets)
+            else:
+                self.Xposition = self.Xposition + self.widthButton + 10
+                buttonThing[id].place(x=self.Xposition, y=self.Yposition,
+                                      width=self.widthButton, height=self.heightWidgets)
 
     """
     OS screen END------------------------------------------------------------------------------------------------------
     OS language -------------------------------------------------------------------------------------------------------
     """
+
     def changeColorLanguage(self, idLanButton):  # LANGUAGE SELECTION
         buttonSelectedColor = "#5c6447"
         if not self.pickedButton is None:
@@ -259,6 +306,7 @@ class showGlobalConfigFrame:
                 self.changeColorLanguage(c)
                 self.radioVar.get()  # needs to be here to show picked selection
                 ryuconf.editConfig("GlobalConfiguration", "language", n)
+
             self.changeLanguageDict[counterLangCount] = Radiobutton(self.frame, text=name, variable=self.radioVar,
                                                                     value=name)
             self.changeLanguageDict[counterLangCount]['font'] = self.fontGet
@@ -278,6 +326,7 @@ class showGlobalConfigFrame:
     
     OS Color scheme------------------------------------------------------------------------------------------------------
     """
+
     def changeColorColorschemeSelection(self, buttonID):  # COLOR SCHEME SELECTION
         buttonSelectedColor = "#5c6447"
         if not self.colorButtonSelected is None:
@@ -299,23 +348,27 @@ class showGlobalConfigFrame:
         self.radioVar2 = StringVar(value=ryuconf.readJsonConfig("GlobalConfiguration", "colorMode"))
         # light mode
         whiteColorButton = Radiobutton(self.frame, text="Light", variable=self.radioVar2, value="Light")
-        whiteColorButton['command'] = lambda: [ryuconf.editConfig("GlobalConfiguration", "colorMode", self.radioVar2.get()),
-                                               self.changeColorColorschemeSelection(whiteColorButton)]
+        whiteColorButton['command'] = lambda: [
+            ryuconf.editConfig("GlobalConfiguration", "colorMode", self.radioVar2.get()),
+            self.changeColorColorschemeSelection(whiteColorButton)]
         whiteColorButton['font'] = self.fontGet
         self.Xposition = self.Xposition + self.widthLabel + 10
         whiteColorButton.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
         # dark mode
         BlackColorButton = Radiobutton(self.frame, text="Dark", variable=self.radioVar2, value="Dark")
-        BlackColorButton['command'] = lambda: [ryuconf.editConfig("GlobalConfiguration", "colorMode", self.radioVar2.get()),
-                                               self.changeColorColorschemeSelection(BlackColorButton)]
+        BlackColorButton['command'] = lambda: [
+            ryuconf.editConfig("GlobalConfiguration", "colorMode", self.radioVar2.get()),
+            self.changeColorColorschemeSelection(BlackColorButton)]
         BlackColorButton['font'] = self.fontGet
         self.Xposition = self.Xposition + self.widthButton + 10
         BlackColorButton.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
+
     """
     OS Color END-----------------------------------------------------------------------------------------------------
     
     OS delay time------------------------------------------------------------------------------------------------------
     """
+
     def checkIfInputIsNumber(self, timeInput, xPos, yPos, whichConfig):
         global timeInt
         try:
@@ -361,11 +414,13 @@ class showGlobalConfigFrame:
 
         self.delaySubmit['command'] = lambda: self.checkIfInputIsNumber(self.inputText.get(1.0, 'end-1c'), getCurrentX,
                                                                         getCurrentY, "soundDelay")
+
     """
     OS DELAY END-----------------------------------------------------------------------------------------------------
 
     OS Alert color------------------------------------------------------------------------------------------------------
     """
+
     def hexCheck(self, hexInput, xPos, yPos):
         # TODO: dodělat oddělaní error labelu, když se pak zadá znovu dobře value
         if not len(hexInput) == 7:  # hex needs (?) to have 7 characters
@@ -422,6 +477,7 @@ class showGlobalConfigFrame:
 
     OS alertSoundLanguage------------------------------------------------------------------------------------------------------
     """
+
     def OSalertSound(self):
         self.Xposition = 0
         self.Yposition = self.Yposition + self.heightWidgets + 10
@@ -435,6 +491,7 @@ class showGlobalConfigFrame:
 
     OS fontSizer------------------------------------------------------------------------------------------------------
     """
+
     def OSfontSize(self):
         self.Xposition = 0
         self.Yposition = self.Yposition + self.heightWidgets + 10
@@ -442,11 +499,13 @@ class showGlobalConfigFrame:
         colorModeLabel = Label(self.frame, text="Font size: ")
         colorModeLabel['font'] = self.fontGet
         colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
+
     """
     OS fontSize END-----------------------------------------------------------------------------------------------------
 
     OS labelFontSize------------------------------------------------------------------------------------------------------
     """
+
     def OSlabelFontSize(self):
         self.Xposition = 0
         self.Yposition = self.Yposition + self.heightWidgets + 10
@@ -460,6 +519,7 @@ class showGlobalConfigFrame:
 
     OS fontThickness------------------------------------------------------------------------------------------------------
     """
+
     def OSfontThicckness(self):
         self.Xposition = 0
         self.Yposition = self.Yposition + self.heightWidgets + 10
@@ -473,6 +533,7 @@ class showGlobalConfigFrame:
 
     OS fontFamily------------------------------------------------------------------------------------------------------
     """
+
     def OSfontFamily(self):
         self.Xposition = 0
         self.Yposition = self.Yposition + self.heightWidgets + 10
@@ -506,10 +567,13 @@ class showGlobalConfigFrame:
                                       self.radioVar2.set(ryuconf.readJsonConfig("GlobalConfiguration", "colorMode")),
                                       self.inputText.delete("1.0", "end"),
                                       self.inputText.insert(1.0,
-                                                       ryuconf.readJsonConfig("GlobalConfiguration", "soundDelay")),
+                                                            ryuconf.readJsonConfig("GlobalConfiguration",
+                                                                                   "soundDelay")),
                                       self.inputHex.delete(1.0, "end"),
-                                      self.inputHex.insert(1.0, ryuconf.readJsonConfig("GlobalConfiguration", "alertColor")),
+                                      self.inputHex.insert(1.0,
+                                                           ryuconf.readJsonConfig("GlobalConfiguration", "alertColor")),
                                       logger.info("resetting config")]
+
 
 class AppBase:
     def __init__(self, root: Tk):
