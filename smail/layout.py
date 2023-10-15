@@ -2,17 +2,16 @@ import logging
 import threading
 import tkinter as tk
 from tkinter import scrolledtext
-from smail.config.style import (font_config, search_mail,
-                                getLanguage, button_hover, button_leave, images, imageConfig, app_color)
-from smail.config.mail_connection import sendEmail, readMail, checkEmailForSpam
+from smail.connection.style import (font_config, search_mail,
+                                    get_language, button_hover, button_leave, images, image_config, app_color, height_config)
+from smail.connection.mail_connection import send_email, read_mail, check_email_for_spam
 from demo.guiTemplate import guiTemplate as temp
 from demo.guiTemplate import configActions as act
-import time
 
 logger = logging.getLogger(__file__)
 
 
-class oneFrame(tk.Frame):
+class one_frame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -25,53 +24,53 @@ class oneFrame(tk.Frame):
         self.menu = temp.App(parent)
 
         # import buttons from GUI template
-        self.redefineTemplateButtons()
+        self.redefine_template_buttons()
         self.button_state = None
 
-        height = temp.resolutionMath()[2]
-        print(height)
+        # number of displayed lines in textarea and listbox
+        self.number_of_lines_listbox, self.number_of_lines_textarea = height_config(self)
 
         # grid configuration
         self.columnconfigure(0, weight=1, uniform="a")
         self.columnconfigure(1, weight=3, uniform="a")
-        self.lFrame = self.leftFrame()
-        self.rFrame = self.rightWriteFrame()
+        self.l_frame = self.left_frame()
+        self.r_frame = self.right_read_frame()
 
-        self.lFrame.grid(
+        self.l_frame.grid(
             column=0
         )
-        self.rFrame.grid(
+        self.r_frame.grid(
             column=1, row=0
         )
         self.pack()
 
         # Start a background thread to load emails
-        self.loadingEmails = threading.Thread(target=self.loadEmails)
-        self.loadingEmails.start()
+        self.loading_emails = threading.Thread(target=self.load_emails)
+        self.loading_emails.start()
 
-    def loadEmails(self):
-        self.insertEmails()
+    def load_emails(self):
+        self.insert_emails()
 
-    def redefineTemplateButtons(self):
+    def redefine_template_buttons(self):
         try:
             # width configuration
-            self.sixHeight = temp.resolutionMath()[2]
-            self.sixWidth = temp.resolutionMath()[1]
-            numOPT = act.jsonRed('buttons_info', "num_of_opt_on_frame")
-            padxValue = act.jsonRed('buttons_info', "padx_value")
-            self.buttonWidth = int(self.sixWidth - (padxValue * numOPT))
+            self.six_height = temp.resolutionMath()[2]
+            self.six_width = temp.resolutionMath()[1]
+            num_opt = act.jsonRed('buttons_info', "num_of_opt_on_frame")
+            padx_value = act.jsonRed('buttons_info', "padx_value")
+            self.button_width = int(self.six_width - (padx_value * num_opt))
 
             # language configuration
-            self.language, self.text = getLanguage()
+            self.language, self.text = get_language()
 
             # image configuration
             self.img = images()
-            self.exitImage = tk.PhotoImage(file=self.img["exit"])
-            self.person1Image = imageConfig("Person1", self.sixHeight)
-            self.person2Image = imageConfig("Person2", self.sixHeight)
-            self.person3Image = imageConfig("Person3", self.sixHeight)
-            self.person4Image = imageConfig("Person4", self.sixHeight)
-            self.person5Image = imageConfig("Person5", self.sixHeight)
+            self.exit_image = tk.PhotoImage(file=self.img["exit"])
+            self.person1_image = image_config("Person1", self.six_height)
+            self.person2_image = image_config("Person2", self.six_height)
+            self.person3_image = image_config("Person3", self.six_height)
+            self.person4_image = image_config("Person4", self.six_height)
+            self.person5_image = image_config("Person5", self.six_height)
         except Exception:
             logger.error("Failed loading language and images")
 
@@ -86,86 +85,76 @@ class oneFrame(tk.Frame):
                 self.menu.menuFrameCreateButtonsVal.optButtons2
             )
 
-            # option menu frame
-            self.opt_menu = self.menu.menuFrameTempVal.configure(bg=self.background_color)
-
-            self.menu_button_1 = self.menu.menuFrameCreateButtonsVal.button_dict[1]
-            self.menu_button_1.configure(bg = self.background_color)
-
             # saving buttons to local variables
-            self.exitButton = self.options_buttons_crt1.button_dict[1]
-            self.sendEmailButton = self.options_buttons_crt1.button_dict[2]
-            self.sendMailPerson1 = self.options_buttons_crt1.button_dict[3]
-            self.sendMailPerson2 = self.options_buttons_crt1.button_dict[4]
-            self.sendMailPerson3 = self.options_buttons_crt2.button_dict[1]
-            self.sendMailPerson4 = self.options_buttons_crt2.button_dict[2]
-            self.sendMailPerson5 = self.options_buttons_crt2.button_dict[3]
-            self.sendMailTo = self.options_buttons_crt2.button_dict[4]
+            self.exit_button = self.options_buttons_crt1.button_dict[1]
+            self.send_email_button = self.options_buttons_crt1.button_dict[2]
+            self.send_mail_person1 = self.options_buttons_crt1.button_dict[3]
+            self.send_mail_person2 = self.options_buttons_crt1.button_dict[4]
+            self.send_mail_person3 = self.options_buttons_crt2.button_dict[1]
+            self.send_mail_person4 = self.options_buttons_crt2.button_dict[2]
+            self.send_mail_person5 = self.options_buttons_crt2.button_dict[3]
+            self.send_mail_to = self.options_buttons_crt2.button_dict[4]
+            self.menu_button_1 = self.menu.menuFrameCreateButtonsVal.button_dict[1]
+            self.menu_button_2 = self.menu.menuFrameCreateButtonsVal.button_dict[2]
 
-            # audio configuration
-            self.audioConfigure(self.exitButton, "exitButton")
-            self.audioConfigure(self.sendEmailButton, "sendEmailButton")
-            self.audioConfigure(self.sendMailPerson1, "person1")
-            self.audioConfigure(self.sendMailPerson2, "person2")
-            self.audioConfigure(self.sendMailPerson3, "person3")
-            self.audioConfigure(self.sendMailPerson4, "person4")
-            self.audioConfigure(self.sendMailPerson5, "person5")
-            self.audioConfigure(self.sendMailTo, "sendToButton")
+            # audio configuration buttons
+            self.audioConfigure(self.exit_button, "exitButton")
+            self.audioConfigure(self.send_email_button, "sendEmailButton")
+            self.audioConfigure(self.send_mail_person1, "person1")
+            self.audioConfigure(self.send_mail_person2, "person2")
+            self.audioConfigure(self.send_mail_person3, "person3")
+            self.audioConfigure(self.send_mail_person4, "person4")
+            self.audioConfigure(self.send_mail_person5, "person5")
+            self.audioConfigure(self.send_mail_to, "sendToButton")
+            self.audioConfigure(self.menu_button_1, "menu1")
+            self.audioConfigure(self.menu_button_2, "menu2")
 
-            self.exitButton.config(
-                image=self.exitImage,
+            self.exit_button.config(
+                image=self.exit_image,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.button_width
 
             )
-            self.sendEmailButton.config(
+            self.send_email_button.config(
                 text = "",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.button_width
 
                 # command=self.sendMail,
             )
-            self.sendMailPerson1.config(
+            self.send_mail_person1.config(
                 command=lambda: self.fillRecipient(1),
-                image=self.person1Image,
+                image=self.person1_image,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.button_width
             )
-            self.sendMailPerson2.config(
+            self.send_mail_person2.config(
                 command=lambda: self.fillRecipient(2),
-                image=self.person2Image,
+                image=self.person2_image,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.button_width
             )
-            self.sendMailPerson3.config(
+            self.send_mail_person3.config(
                 command=lambda: self.fillRecipient(3),
-                image=self.person3Image,
+                image=self.person3_image,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.button_width
             )
-            self.sendMailPerson4.config(
+            self.send_mail_person4.config(
                 command=lambda: self.fillRecipient(4),
-                image=self.person4Image,
+                image=self.person4_image,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.button_width
             )
-            self.sendMailPerson5.config(
+            self.send_mail_person5.config(
                 command=lambda: self.fillRecipient(5),
-                image=self.person5Image,
+                image=self.person5_image,
                 text="",
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.button_width
             )
-            self.sendMailTo.config(
+            self.send_mail_to.config(
                 command=lambda: self.fillRecipient(0),
                 text=self.text[f"smail_{self.language}_sendToButton"],
-                width=self.buttonWidth,
-                bg=self.background_color
+                width=self.button_width
             )
             logger.info("Buttons successfully redefined.")
         except AttributeError:
@@ -175,218 +164,225 @@ class oneFrame(tk.Frame):
         except Exception:
             logger.error("Error:", exc_info=True)
 
-    def leftFrame(self):
+    def left_frame(self):
 
         self.frame = tk.Frame(self)
         self.frame.configure(bg=self.background_color)
         self.frame.columnconfigure(0, weight=1, uniform="a")
         self.frame.rowconfigure(0, weight=1, uniform="a")
-        self.inboxLabel = tk.Label(
+        self.inbox_label = tk.Label(
             self.frame, text=self.text[f"smail_{self.language}_inboxLabel"],
             font=font_config(), bg=self.background_color
         )
-        self.inboxList = tk.Listbox(
-            self.frame, font=font_config(), height=13, width=40,
+        self.inbox_list = tk.Listbox(
+            self.frame, font=font_config(), height=self.number_of_lines_listbox,
             activestyle="none", selectmode=tk.SINGLE
         )
-        self.inboxLabel.grid(
+        self.inbox_label.grid(
             row=0, column=0,
             sticky="nsew", padx=10, pady=10, ipady=5
         )
-        self.inboxList.grid(
+        self.inbox_list.grid(
             row=1, column=0,
             sticky="nsew", padx=20, pady=20
         )
 
-
+        self.audioConfigure(self.inbox_list, "inbox")
 
         logger.info("Created left frame with received emails in listbox.")
         return self.frame
 
-    def rightWriteFrame(self):
-        self.rwframe = tk.Frame(self)
-        self.rwframe.configure(bg=self.background_color)
-        self.rwframe.columnconfigure((0, 1), weight=1, uniform="a")
-        self.rwframe.rowconfigure((0, 1, 2, 4), weight=1, uniform="a")
-        self.rwframe.rowconfigure(3, weight=2, uniform="a")
-        self.recipientLabel = tk.Label(
-            self.rwframe,
+    def right_write_frame(self):
+        self.rw_frame = tk.Frame(self)
+        self.rw_frame.configure(bg=self.background_color)
+        self.rw_frame.columnconfigure((0, 1), weight=1, uniform="a")
+        self.rw_frame.rowconfigure((0, 1, 2, 4), weight=1, uniform="a")
+        self.rw_frame.rowconfigure(3, weight=2, uniform="a")
+        self.recipient_label = tk.Label(
+            self.rw_frame,
             text=self.text[f"smail_{self.language}_recipientLabel"],
             font=font_config(), bg=self.background_color
         )
-        self.subjectLabel = tk.Label(
-            self.rwframe,
+        self.subject_label = tk.Label(
+            self.rw_frame,
             text=self.text[f"smail_{self.language}_subjectLabel"],
             font=font_config(), bg=self.background_color
         )
-        self.contentLabel = tk.Label(
-            self.rwframe,
+        self.content_label = tk.Label(
+            self.rw_frame,
             text=self.text[f"smail_{self.language}_messageLabel"],
             font=font_config(), background=self.background_color
         )
-        self.recipientEntry = tk.Entry(
-            self.rwframe, font=font_config()
+        self.recipient_entry = tk.Entry(
+            self.rw_frame, font=font_config()
         )
-        self.subjectEntry = tk.Entry(
-            self.rwframe, font=font_config()
+        self.subject_entry = tk.Entry(
+            self.rw_frame, font=font_config()
         )
-        self.contentEntry = scrolledtext.ScrolledText(
-            self.rwframe, font=font_config(), height=10
+        self.content_entry = scrolledtext.ScrolledText(
+            self.rw_frame, font=font_config(), height=self.number_of_lines_textarea
         )
+
+        # audio configuration
+        self.audioConfigure(self.recipient_entry, "recipient")
+        self.audioConfigure(self.subject_entry, "subject")
+        self.audioConfigure(self.content_entry, "write_message")
+
         # widget placement
-        self.recipientLabel.grid(
+        self.recipient_label.grid(
             row=0, column=0,
             sticky="e", padx=10, pady=10
         )
-        self.subjectLabel.grid(
+        self.subject_label.grid(
             row=1, column=0,
             sticky="e", padx=10, pady=10
         )
-        self.contentLabel.grid(
+        self.content_label.grid(
             row=2, column=0,
             sticky="w", padx=10, pady=10
         )
-        self.recipientEntry.grid(
+        self.recipient_entry.grid(
             row=0, column=1,
             sticky="nsew", padx=10, pady=10
         )
-        self.subjectEntry.grid(
+        self.subject_entry.grid(
             row=1, column=1,
             sticky="nsew", padx=10, pady=10
         )
-        self.contentEntry.grid(
+        self.content_entry.grid(
             row=3, column=0, columnspan=2, rowspan=2,
             padx=10, pady=10, ipady=10, sticky="new"
         )
 
-        return self.rwframe
+        return self.rw_frame
 
-    def rightReadFrame(self):
-        self.rrframe = tk.Frame(self)
-        self.rrframe.configure(bg=self.background_color)
-        self.rrframe.columnconfigure(0, weight=2, uniform="a")
-        self.rrframe.rowconfigure(0, weight=1, uniform="a")
-        self.messageLabel = tk.Label(
-            self.rrframe,
+    def right_read_frame(self):
+        self.rr_frame = tk.Frame(self)
+        self.rr_frame.configure(bg=self.background_color)
+        self.rr_frame.columnconfigure(0, weight=2, uniform="a")
+        self.rr_frame.rowconfigure(0, weight=1, uniform="a")
+        self.message_label = tk.Label(
+            self.rr_frame,
             text=self.text[f"smail_{self.language}_messageLabel"],
             font=font_config(), bg=self.background_color
         )
-        self.messageArea = scrolledtext.ScrolledText(
-            self.rrframe, font=font_config(), height=13
+        self.message_area = scrolledtext.ScrolledText(
+            self.rr_frame, font=font_config(), height=self.number_of_lines_listbox
         )
-        self.messageLabel.grid(
+
+        # audio configuration
+        self.audioConfigure(self.message_area, "read_message")
+
+
+        # grid configuration
+        self.message_label.grid(
             row=0, column=0, ipady=5,
             sticky="nsew", padx=10, pady=10
         )
-        self.messageArea.grid(
+        self.message_area.grid(
             row=1, column=0,
             sticky="nsew", padx=20, pady=20
         )
 
-        return self.rrframe
+        return self.rr_frame
 
-    def insertEmails(self):
+    # simplify
+    def insert_emails(self):
 
         try:
-            self.emails = readMail()
+            self.emails = read_mail()
             try:
-                self.safe_emails = checkEmailForSpam(self.emails)
+                self.safe_emails = check_email_for_spam(self.emails)
                 for n in self.safe_emails:
-                    self.inboxList.insert(tk.END, n.split("From:")[0])
+                    self.inbox_list.insert(tk.END, n.split("From:")[0])
                     # binding listbox to text area to view email
-                    self.inboxList.bind("<<ListboxSelect>>", self.showEmail)
-                logger.info("Anti-phishing filters applied.")
+                    self.inbox_list.bind("<<ListboxSelect>>", self.showEmail)
             except Exception:
                 logger.critical("Failed to apply anti-phishing filters."
                                 "Omitting security steps.", exc_info=True)
                 self.safe_emails = self.emails
                 for n in self.emails:
-                    self.inboxList.insert(tk.END, n.split("From:")[0])
+                    self.inbox_list.insert(tk.END, n.split("From:")[0])
                     # binding listbox to text area to view email
-                    self.inboxList.bind("<<ListboxSelect>>", self.showEmail)
+                    self.inbox_list.bind("<<ListboxSelect>>", self.showEmail)
         except Exception:
             logger.error("Error when trying to fill in the listbox. ",
                          exc_info=True)
 
     def showEmail(self, event):
         # switch frames
-        self.switchToReadingMail()
+        self.switch_to_reading_mail()
 
-        if not self.inboxList.curselection():
+        if not self.inbox_list.curselection():
             # If no selection, use the last selected email
-            if (self.lastSelectedIndex is not None
-                    and self.lastSelectedEmail is not None):
-                self.configureMessageArea(self.lastSelectedEmail)
+            if (self.last_selected_index is not None
+                    and self.last_selected_email is not None):
+                self.configure_message_area(self.last_selected_email)
 
-        selectedIndex = self.inboxList.curselection()[0]
-        selectedEmail = self.safe_emails[selectedIndex]
-        self.configureMessageArea(selectedEmail)
+        selected_index = self.inbox_list.curselection()[0]
+        selected_email = self.safe_emails[selected_index]
+        self.configure_message_area(selected_email)
 
         # Update the last selected index and email
-        self.lastSelectedIndex = selectedIndex
-        self.lastSelectedEmail = selectedEmail
+        self.last_selected_index = selected_index
+        self.last_selected_email = selected_email
 
-    def configureMessageArea(self, email):
-        self.messageArea.configure(state="normal")
-        self.messageArea.delete("1.0", tk.END)
-        self.messageArea.insert(tk.END, email)
-        self.messageArea.configure(state="disabled")
+    def configure_message_area(self, email):
+        self.message_area.configure(state="normal")
+        self.message_area.delete("1.0", tk.END)
+        self.message_area.insert(tk.END, email)
+        self.message_area.configure(state="disabled")
 
-    def switchToReadingMail(self):
-        self.rFrame = self.rightReadFrame()
-        self.rFrame.grid(
+    def switch_to_reading_mail(self):
+        self.r_frame = self.right_read_frame()
+        self.r_frame.grid(
             column=1, row=0
         )
         self.pack()
 
-    def switchToWriteMail(self):
-        self.rFrame = self.rightWriteFrame()
-        self.rFrame.grid(
+    def switch_to_write_mail(self):
+        self.r_frame = self.right_write_frame()
+        self.r_frame.grid(
             column=1, row=0
         )
         self.pack()
-        return self.recipientEntry
+        return self.recipient_entry
 
-    def getRecipientEntry(self):
-        return self.recipientEntry
+    def get_recipient_entry(self):
+        return self.recipient_entry
 
-    def sendEmailStatus(self):
+    def send_email_status(self):
 
-        succ = sendEmail(
-            self.recipientEntry.get(), self.subjectEntry.get(),
-            self.contentEntry.get("1.0", tk.END)
+        succ = send_email(
+            self.recipient_entry.get(), self.subject_entry.get(),
+            self.content_entry.get("1.0", tk.END)
         )
 
-        # this logging in mail_connection.py
         if succ == 1:
-            logger.info(f"Email successfully sent to "
-                        f"{self.recipientEntry.get()}.")
-            self.recipientEntry.delete(0, tk.END)
-            self.subjectEntry.delete(0, tk.END)
-            self.contentEntry.delete("1.0", tk.END)
-        # else:
-        #     logger.error("Error occurred when trying to send email."
-        #                   "Check email and password configuration.")
-        #     # print("Error occurred when trying to send email. "
-        #     #       "Check email and password configuration.", succ)
+            self.recipient_entry.delete(0, tk.END)
+            self.subject_entry.delete(0, tk.END)
+            self.content_entry.delete("1.0", tk.END)
 
     def fillRecipient(self, id):
+
+        if self.r_frame == self.rr_frame:
+            self.r_frame = self.right_write_frame()
         # if every Entry obtains text, message will be sent
         # when pressing Person[id] button for the second time.
-        if (self.recipientEntry.get() and self.subjectEntry.get() and
-                self.contentEntry.get("1.0", tk.END).strip() and
+        if (self.recipient_entry.get() and self.subject_entry.get() and
+                self.content_entry.get("1.0", tk.END).strip() and
                 id == self.button_state):
-            self.sendEmailStatus()
+            self.send_email_status()
 
         # if another Person[id] button is pressed,
         # Entries will be deleted,
         # new recipient entry will be filled in.
-        elif (self.subjectEntry.get() or
-              self.contentEntry.get("1.0", tk.END).strip()):
+        elif (self.subject_entry.get() or
+              self.content_entry.get("1.0", tk.END).strip()):
             if id != self.button_state:
                 print("No content to send.")
                 email = search_mail(id)
-                recipient = self.switchToWriteMail()
+                recipient = self.switch_to_write_mail()
                 recipient.delete(0, tk.END)
                 recipient.insert(0, email)
                 recipient.configure(state="disabled")
@@ -400,7 +396,7 @@ class oneFrame(tk.Frame):
             # recipient entry is deleted.
             if id == 0:
                 print("Send To button pressed")
-                recipient = self.switchToWriteMail()
+                recipient = self.switch_to_write_mail()
                 recipient.delete(0, tk.END)
             # if Person[id] button is pressed for the second time,
             # but none of the entry is filled in.
@@ -408,7 +404,7 @@ class oneFrame(tk.Frame):
                 print("Button pressed for the second time,"
                       " no entry is filled in.")
                 email = search_mail(id)
-                recipient = self.switchToWriteMail()
+                recipient = self.switch_to_write_mail()
                 recipient.delete(0, tk.END)
                 recipient.insert(0, email)
                 recipient.configure(state="disabled")
