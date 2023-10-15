@@ -3,20 +3,19 @@ import os
 import logging
 from getmac import get_mac_address as gmac
 
-
 logger = logging.getLogger(__file__)
 logger.info("initiated logging")
 
 
 def temporaryGetPath():  # this is how i get to the sconf/ file, for now :)
-    currentDir = os.path.dirname(os.path.dirname(__file__))
-    parentCurentDir = os.path.abspath(os.path.join(currentDir, os.pardir))
-    supaParent = os.path.abspath(os.path.join(parentCurentDir, os.pardir))
-    confPath = os.path.join(supaParent, "sconf")
-    return confPath
+    whereTheFuckAmI = os.getcwd()
+    split = whereTheFuckAmI.split("sgive")
+    path = split[0]
+    configPath = os.path.join(path, "sconf")
+    return configPath
 
 
-def readFile(key, value):
+def readJsonConfig(key, value):
     path = temporaryGetPath()
     if os.path.exists(path) and os.path.isfile(
             os.path.join(temporaryGetPath(), 'config.json')):  # checks for the conf file, if there is any
@@ -38,19 +37,16 @@ def readLog():
         exit(1)
 
 
-def testRead(key, value):
-    with open('data.json', "r") as file:
-        jsonData = json.load(file)
-    return jsonData[key][value]
-
-
 def editConfig(key, name, value):
     # this def edits name in conf.json to value
-    with open('data.json', 'r') as file:
-        data = json.load(file)
-        data[key][name] = value
-    with open('data.json', 'w') as f:
-        json.dump(data, f, indent=4)
+    path = temporaryGetPath()
+    # checks for the conf file, if there is any
+    if os.path.exists(path) and os.path.isfile(os.path.join(temporaryGetPath(), 'config.json')):
+        with open(os.path.join(path, 'config.json'), 'r') as file:
+            data = json.load(file)
+            data[key][name] = value
+        with open(os.path.join(path, 'config.json'), 'w') as f:
+            json.dump(data, f, indent=4)
     logging.info(f'successfully edited value: "{value}" at key: "{name}".')
 
 
@@ -59,13 +55,17 @@ def getMac():
     return mac
 
 
-def caregiverAppConfig():
+def caregiverAppConfig(path):
     options = ["Global\nconfig", "Mail\nconfig", "Web\nconfig", "LOGS"]
     languageOPT = ["Czech", "English", "German"]
     dictionary = {
+        'pathToConfig': {
+            "path": path
+        },
         'GlobalConfiguration': {
-            "language": "english",
-            "colorMode": "white",
+            "numOfScreen": 0,
+            "language": "English",
+            "colorMode": "Light",
             "soundDelay": 5,
             "alertColor": "#AAFF00",
             "alertSoundLanguage": "english",
@@ -97,5 +97,5 @@ def caregiverAppConfig():
         },
     }
     json_object = json.dumps(dictionary, indent=4)
-    with open('data.json', "w+") as outfile:
+    with open(os.path.join(path, 'config.json'), "w+") as outfile:
         outfile.write(json_object)

@@ -12,7 +12,14 @@ logging.basicConfig(
 )
 
 if __name__ == '__main__':
-    ryuconf.caregiverAppConfig()
+    whereTheFuckAmI = os.getcwd()
+    split = whereTheFuckAmI.split("sgive")
+    path = split[0]
+    configPath = os.path.join(path, "sconf")
+    #create config, only if there is not any config.json already
+    if os.path.exists(configPath) and not os.path.isfile(os.path.join(configPath, 'config.json')):
+        ryuconf.caregiverAppConfig(configPath)
+
     root = Tk()
     ryuGUI.AppBase(root)
     root.mainloop()
