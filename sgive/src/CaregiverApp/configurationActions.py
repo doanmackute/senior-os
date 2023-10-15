@@ -75,18 +75,6 @@ def caregiverAppConfig(path):
             "fontFamily": "Helvetica",
             "macAddress": getMac(),
         },
-        'smail': {
-            "smtp": "X",
-            "imap": "X",
-            "icons": "X",
-            "photographyURL": "X",
-            "soundsUrl": "X",
-        },
-        'sweb': {
-            "photography": "X",
-            "iconsURL": "X",
-            "sounds": "X",
-        },
         'careConf': {
             "fg": 5,
             "bg": 5,
