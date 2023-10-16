@@ -32,13 +32,13 @@ class menuBarButtons:
         self.pickedButton = None
 
     def selectedButton(self, x):
-        selectedColor = "gray"  # TODO: lehce teplejší šedou než jest tato
+        selectedColor = "#9e9d99"  # TODO: lehce teplejší šedou než jest tato
         if self.lastSelectedButton is None:
             self.buttonDictionary[x]['activebackground'] = selectedColor  # selected
             self.buttonDictionary[x]['bg'] = selectedColor  # selected
             self.lastSelectedButton = x
         else:
-            self.buttonDictionary[self.lastSelectedButton]['activebackground'] = "#a8a7a2"  # normal
+            self.buttonDictionary[self.lastSelectedButton]['activebackground'] = "#ebe9e4"  # normal
             self.buttonDictionary[self.lastSelectedButton]['bg'] = "#C7C6C1"  # normal
             self.lastSelectedButton = x
             self.buttonDictionary[x]['activebackground'] = selectedColor  # selected
@@ -64,7 +64,7 @@ class menuBarButtons:
             self.buttonDictionary[counter] = Button(self.menuFrame)
             self.buttonDictionary[counter]['text'] = i
             self.buttonDictionary[counter]['bg'] = '#C7C6C1'
-            self.buttonDictionary[counter]['activebackground'] = '#a8a7a2'
+            self.buttonDictionary[counter]['activebackground'] = '#ebe9e4'
             self.buttonDictionary[counter]['relief'] = 'solid'
             self.buttonDictionary[counter]['command'] = getButtonNum
             self.buttonDictionary[counter]['font'] = "Helvetica 36 bold"
