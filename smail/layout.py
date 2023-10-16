@@ -3,8 +3,11 @@ import threading
 import tkinter as tk
 from tkinter import scrolledtext
 from smail.connection.style import (font_config, search_mail,
-                                    get_language, button_hover, button_leave, images, image_config, app_color, height_config)
-from smail.connection.mail_connection import send_email, read_mail, check_email_for_spam
+                                    get_language, button_hover, button_leave,
+                                    images, image_config, app_color,
+                                    height_config)
+from smail.connection.mail_connection import (send_email, read_mail,
+                                              check_email_for_spam)
 from demo.guiTemplate import guiTemplate as temp
 from demo.guiTemplate import configActions as act
 
@@ -15,24 +18,27 @@ class one_frame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
+        # initiate logging
+        logger.info("Initiated logging.")
+
         # background color
         self.background_color = app_color()
         self.configure(bg=self.background_color)
 
-        # initiate logging
-        logger.info("Initiated logging.")
-        self.menu = temp.App(parent)
-
         # import buttons from GUI template
+        self.menu = temp.App(parent)
         self.redefine_template_buttons()
         self.button_state = None
 
         # number of displayed lines in textarea and listbox
-        self.number_of_lines_listbox, self.number_of_lines_textarea = height_config(self)
+        (self.number_of_lines_listbox,
+         self.number_of_lines_textarea) = height_config(self)
 
         # grid configuration
         self.columnconfigure(0, weight=1, uniform="a")
         self.columnconfigure(1, weight=3, uniform="a")
+
+        # frame configuration
         self.l_frame = self.left_frame()
         self.r_frame = self.right_read_frame()
 
@@ -49,15 +55,18 @@ class one_frame(tk.Frame):
         self.loading_emails.start()
 
     def load_emails(self):
+        # function that initializes loading emails
         self.insert_emails()
 
     def redefine_template_buttons(self):
         try:
-            # width configuration
+            # width and height configuration
             self.six_height = temp.resolutionMath()[2]
             self.six_width = temp.resolutionMath()[1]
             num_opt = act.jsonRed('buttons_info', "num_of_opt_on_frame")
             padx_value = act.jsonRed('buttons_info', "padx_value")
+
+            # calculating the width of each button according to screen width
             self.button_width = int(self.six_width - (padx_value * num_opt))
 
             # language configuration
@@ -71,6 +80,7 @@ class one_frame(tk.Frame):
             self.person3_image = image_config("Person3", self.six_height)
             self.person4_image = image_config("Person4", self.six_height)
             self.person5_image = image_config("Person5", self.six_height)
+
         except Exception:
             logger.error("Failed loading language and images")
 
@@ -94,8 +104,10 @@ class one_frame(tk.Frame):
             self.send_mail_person4 = self.options_buttons_crt2.button_dict[2]
             self.send_mail_person5 = self.options_buttons_crt2.button_dict[3]
             self.send_mail_to = self.options_buttons_crt2.button_dict[4]
-            self.menu_button_1 = self.menu.menuFrameCreateButtonsVal.button_dict[1]
-            self.menu_button_2 = self.menu.menuFrameCreateButtonsVal.button_dict[2]
+            self.menu_button_1 = (
+                self.menu.menuFrameCreateButtonsVal.button_dict)[1]
+            self.menu_button_2 = (
+                self.menu.menuFrameCreateButtonsVal.button_dict)[2]
 
             # audio configuration buttons
             self.audioConfigure(self.exit_button, "exitButton")
@@ -116,7 +128,7 @@ class one_frame(tk.Frame):
 
             )
             self.send_email_button.config(
-                text = "",
+                text="",
                 width=self.button_width
 
                 # command=self.sendMail,
@@ -166,18 +178,29 @@ class one_frame(tk.Frame):
 
     def left_frame(self):
 
+        # fixed non-changing frame with received emails
         self.frame = tk.Frame(self)
         self.frame.configure(bg=self.background_color)
+
+        # grid configuration
         self.frame.columnconfigure(0, weight=1, uniform="a")
         self.frame.rowconfigure(0, weight=1, uniform="a")
+
+        # widget configuration
         self.inbox_label = tk.Label(
             self.frame, text=self.text[f"smail_{self.language}_inboxLabel"],
             font=font_config(), bg=self.background_color
         )
         self.inbox_list = tk.Listbox(
-            self.frame, font=font_config(), height=self.number_of_lines_listbox,
+            self.frame, font=font_config(),
+            height=self.number_of_lines_listbox,
             activestyle="none", selectmode=tk.SINGLE
         )
+
+        # audio configuration
+        self.audioConfigure(self.inbox_list, "inbox")
+
+        # widget placement
         self.inbox_label.grid(
             row=0, column=0,
             sticky="nsew", padx=10, pady=10, ipady=5
@@ -187,17 +210,21 @@ class one_frame(tk.Frame):
             sticky="nsew", padx=20, pady=20
         )
 
-        self.audioConfigure(self.inbox_list, "inbox")
-
         logger.info("Created left frame with received emails in listbox.")
         return self.frame
 
     def right_write_frame(self):
+
+        # changeable frame
         self.rw_frame = tk.Frame(self)
         self.rw_frame.configure(bg=self.background_color)
+
+        # grid configuration
         self.rw_frame.columnconfigure((0, 1), weight=1, uniform="a")
         self.rw_frame.rowconfigure((0, 1, 2, 4), weight=1, uniform="a")
         self.rw_frame.rowconfigure(3, weight=2, uniform="a")
+
+        # widget configuration
         self.recipient_label = tk.Label(
             self.rw_frame,
             text=self.text[f"smail_{self.language}_recipientLabel"],
@@ -220,7 +247,8 @@ class one_frame(tk.Frame):
             self.rw_frame, font=font_config()
         )
         self.content_entry = scrolledtext.ScrolledText(
-            self.rw_frame, font=font_config(), height=self.number_of_lines_textarea
+            self.rw_frame, font=font_config(),
+            height=self.number_of_lines_textarea
         )
 
         # audio configuration
@@ -257,24 +285,30 @@ class one_frame(tk.Frame):
         return self.rw_frame
 
     def right_read_frame(self):
+
+        # changeable frame
         self.rr_frame = tk.Frame(self)
         self.rr_frame.configure(bg=self.background_color)
+
+        # grid configuration
         self.rr_frame.columnconfigure(0, weight=2, uniform="a")
         self.rr_frame.rowconfigure(0, weight=1, uniform="a")
+
+        # widget configuration
         self.message_label = tk.Label(
             self.rr_frame,
             text=self.text[f"smail_{self.language}_messageLabel"],
             font=font_config(), bg=self.background_color
         )
         self.message_area = scrolledtext.ScrolledText(
-            self.rr_frame, font=font_config(), height=self.number_of_lines_listbox
+            self.rr_frame, font=font_config(),
+            height=self.number_of_lines_listbox
         )
 
         # audio configuration
         self.audioConfigure(self.message_area, "read_message")
 
-
-        # grid configuration
+        # widget placement
         self.message_label.grid(
             row=0, column=0, ipady=5,
             sticky="nsew", padx=10, pady=10
@@ -286,31 +320,30 @@ class one_frame(tk.Frame):
 
         return self.rr_frame
 
-    # simplify
     def insert_emails(self):
 
+        # getting emails from inbox
+        self.emails, self.subject = read_mail()
+
         try:
-            self.emails = read_mail()
-            try:
-                self.safe_emails = check_email_for_spam(self.emails)
-                for n in self.safe_emails:
-                    self.inbox_list.insert(tk.END, n.split("From:")[0])
-                    # binding listbox to text area to view email
-                    self.inbox_list.bind("<<ListboxSelect>>", self.showEmail)
-            except Exception:
-                logger.critical("Failed to apply anti-phishing filters."
-                                "Omitting security steps.", exc_info=True)
-                self.safe_emails = self.emails
-                for n in self.emails:
-                    self.inbox_list.insert(tk.END, n.split("From:")[0])
-                    # binding listbox to text area to view email
-                    self.inbox_list.bind("<<ListboxSelect>>", self.showEmail)
+            # filtering emails
+            self.safe_emails = check_email_for_spam(self.emails)
         except Exception:
-            logger.error("Error when trying to fill in the listbox. ",
-                         exc_info=True)
+
+            # in case filtering fails, all emails will be displayed
+            self.safe_emails = self.emails
+            logger.critical("Failed to apply anti-phishing filters."
+                            "Omitting security steps.", exc_info=True)
+
+        # inserting emails into the listbox
+        for n in self.safe_emails:
+            self.inbox_list.insert(tk.END, n.split("\n")[0])
+            # binding listbox to text area to view email
+            self.inbox_list.bind("<<ListboxSelect>>", self.showEmail)
 
     def showEmail(self, event):
-        # switch frames
+
+        # switch frames to reading frame
         self.switch_to_reading_mail()
 
         if not self.inbox_list.curselection():
@@ -328,12 +361,14 @@ class one_frame(tk.Frame):
         self.last_selected_email = selected_email
 
     def configure_message_area(self, email):
+        # inserting email into text area
         self.message_area.configure(state="normal")
         self.message_area.delete("1.0", tk.END)
         self.message_area.insert(tk.END, email)
         self.message_area.configure(state="disabled")
 
     def switch_to_reading_mail(self):
+        # switching frame
         self.r_frame = self.right_read_frame()
         self.r_frame.grid(
             column=1, row=0
@@ -341,6 +376,7 @@ class one_frame(tk.Frame):
         self.pack()
 
     def switch_to_write_mail(self):
+        # switching frame
         self.r_frame = self.right_write_frame()
         self.r_frame.grid(
             column=1, row=0
@@ -353,12 +389,14 @@ class one_frame(tk.Frame):
 
     def send_email_status(self):
 
-        succ = send_email(
+        # sending email
+        status = send_email(
             self.recipient_entry.get(), self.subject_entry.get(),
             self.content_entry.get("1.0", tk.END)
         )
 
-        if succ == 1:
+        # if successful, all entries are deleted
+        if status == 1:
             self.recipient_entry.delete(0, tk.END)
             self.subject_entry.delete(0, tk.END)
             self.content_entry.delete("1.0", tk.END)
@@ -374,7 +412,7 @@ class one_frame(tk.Frame):
                 id == self.button_state):
             self.send_email_status()
 
-        # if another Person[id] button is pressed,
+        # if another Person[id] button is pressed:
         # Entries will be deleted,
         # new recipient entry will be filled in.
         elif (self.subject_entry.get() or

@@ -8,15 +8,28 @@ from demo.guiTemplate.guiTemplate import resolutionMath
 
 logger = logging.getLogger(__file__)
 
-def font_config():
+
+def load_json_file(file_path):
     try:
-        with open("../sconf/config.json", "r") as f:
-            config = json.loads(f.read())
-            font_info = config["font_info"]["font"]
-        f.close()
-        return font_info
-    except Exception:
-        logger.error("Couldn't read fontconfig, file is missing.", exc_info=True)
+        with open(file_path, "r") as f:
+            data = json.load(f)
+        return data
+    except FileNotFoundError:
+        logging.error(f"File not found: {file_path}")
+    except json.JSONDecodeError as json_error:
+        logging.error(f"Error decoding JSON in file: {file_path}", exc_info=True)
+    except Exception as error:
+        logging.error(f"An unexpected error occurred while loading data from {file_path}", exc_info=True)
+    # Return None to indicate failure
+    return None
+
+
+def font_config():
+
+    # reading font configuration
+    data = load_json_file("../sconf/config.json")
+    font_info = data["font_info"]["font"]
+    return font_info
 
 
 def button_config():
@@ -28,67 +41,60 @@ def button_config():
     return "my.TButton"
 
 def app_color():
-    try:
-        with open("../sconf/config.json", "r") as f:
-            config = json.loads(f.read())
-            bg = config["colors_info"]["app_frame"]
-        f.close()
-        return bg
-    except Exception:
-        logger.error("Couldn't read application color, file is missing.", exc_info=True)
+
+    # reading background color configuration
+    data = load_json_file("../sconf/config.json")
+    bg = data["colors_info"]["app_frame"]
+    return bg
 
 
 def images():
-    try:
-        with open("../sconf/SMAIL_config.json", "r") as f:
-            data = json.loads(f.read())
-            images = data["images"]
-        f.close()
-        return images
-    except Exception:
-        logger.error("Couldn't find SMAIL_config.json", exc_info=True)
 
+    # reading image configuration
+    data = load_json_file("../sconf/SMAIL_config.json")
+    images = data["images"]
+    return images
+
+
+def image_config(name, btn_height):
+
+    data = images()
+    path = data[name]
+    original_image = Image.open(path)
+    height_ratio = btn_height / original_image.height
+    new_height = int(original_image.height * height_ratio)
+    resized_image = original_image.resize((int(original_image.width * height_ratio), new_height), PIL.Image.LANCZOS)
+    image = ImageTk.PhotoImage(resized_image)
+    return image
 
 
 def search_mail(id):
-    try:
-        with open("../sconf/SMAIL_config.json", "r") as f:
-            data = json.loads(f.read())
-            emails = data["emails"]
-            email = emails[f"Person{id}"]
-        f.close()
-        return email
-    except Exception:
-        logger.error("Couldn't find SMAIL_config.json", exc_info=True)
+
+    # searching email address of a person
+    data = load_json_file("../sconf/SMAIL_config.json")
+    emails = data["emails"]
+    email = emails[f"Person{id}"]
+    return email
 
 
 def get_language():
-    try:
-        with open("../sconf/SMAIL_config.json") as f:
-            data = json.loads(f.read())
-            language = data["lang"]
-            text = data["text"]
-        f.close()
-        return language, text
-    except Exception:
-        logger.error("Couldn't find SMAIL_config.json",
-                     exc_info=True)
+
+    # checks selected language
+    data = load_json_file("../sconf/SMAIL_config.json")
+    language = data["lang"]
+    text = data["text"]
+    return language, text
 
 
 # audio session
 def get_audio():
+
     # reads configuration from json file
-    try:
-        with open("../sconf/SMAIL_config.json") as f:
-            data = json.loads(f.read())
-            language = data["lang"]
-            audio = data["audio"]
-            timer = data["timer"]
-        f.close()
-        return language, audio, timer
-    except Exception:
-        logger.error("Couldn't find SMAIL_config.json",
-                     exc_info=True)
+    data = load_json_file("../sconf/SMAIL_config.json")
+    language = data["lang"]
+    audio = data["audio"]
+    timer = data["timer"]
+    return language, audio, timer
 
 
 def play_sound(button_name):
@@ -103,8 +109,8 @@ def play_sound(button_name):
 def button_hover(button, button_name, enter_time):
     # Function is called when the mouse cursor hovers over a button.
     language, audio, timer = get_audio()
-    # It schedules playing sound after a specified time delay.
-    # It stores the scheduled time event ID in enter_time[0].
+    # Scheduling playing sound after a specified time delay.
+    # Storing the scheduled time event ID in enter_time[0].
     enter_time[0] = button.after(timer, lambda: play_sound(button_name))
 
 
@@ -116,17 +122,11 @@ def button_leave(button, enter_time):
     if enter_time[0]:
         button.after_cancel(enter_time[0])
 
-def image_config(name, btn_height):
-    data = images()
-    path = data[name]
-    original_image = Image.open(path)
-    height_ratio = btn_height / original_image.height
-    new_height = int(original_image.height * height_ratio)
-    resized_image = original_image.resize((int(original_image.width * height_ratio), new_height), PIL.Image.LANCZOS)
-    image = ImageTk.PhotoImage(resized_image)
-    return image
+# end of audio session
+
 
 def height_config(parent):
+    # getting a height usable for text area and listbox
 
     font_base = font_config()
 
