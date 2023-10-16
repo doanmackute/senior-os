@@ -4,7 +4,7 @@ import json, sys
 def load_config_json():
     # Exit when error occurs and print notification to log
     try:
-        with open("../sconf/config.json", "r") as f:
+        with open("../sconf/config.json", "r",encoding='utf-8') as f:
             configData = json.load(f)
         f.close()
         return configData
@@ -17,7 +17,7 @@ def load_config_json():
 def load_sweb_config_json():
     # Exit when error occurs and print notification to log
     try:
-        with open("../sconf/SWEB_config.json", "r") as f:
+        with open("../sconf/SWEB_config.json", "r",encoding='utf-8') as f:
             langDB = json.load(f)
         f.close()
         return langDB
@@ -29,7 +29,7 @@ def load_sweb_config_json():
 def load_config_in_same_directory(file_name):
     # Exit when error occurs and print notification to log
     try:
-        with open(file_name, 'r') as f:
+        with open(file_name, 'r',encoding='utf-8') as f:
             data = json.load(f)
         f.close
         return data

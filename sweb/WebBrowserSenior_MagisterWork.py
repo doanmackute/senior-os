@@ -1,16 +1,34 @@
 from math import log
-from PyQt5.QtWidgets import QMainWindow, QApplication, QMenu, QStyle, QLabel, QVBoxLayout, QMessageBox, QFrame, QToolButton, QMenuBar, QInputDialog
-from PyQt5.QtWidgets import QLineEdit, QPushButton, QAction, QToolBar, QToolTip, QLineEdit, QHBoxLayout, QWidget, QSizePolicy
+from PyQt5.QtWidgets import QMainWindow, QApplication, QMenu, QStyle, QLabel, QVBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QLineEdit, QPushButton, QAction, QToolBar,QLineEdit, QHBoxLayout, QWidget, QSizePolicy
 from PyQt5.QtGui import QIcon, QCursor
 from urllib.parse import urlparse
 from PyQt5.QtWebEngineWidgets import *
-from PyQt5.QtCore import QEvent, QObject, QUrl, QPoint, Qt, QTimer, QSize
-import sys, os, tarfile, json, subprocess
+from PyQt5.QtCore import QEvent, QUrl, Qt, QTimer, QSize, QObject, pyqtSlot
+import sys, os, tarfile, subprocess
 import logging
 from datetime import datetime
 from loadConfig import *
 from functools import partial
 from languge_Translator import Translator
+import pygame
+from PyQt5.QtWebChannel import QWebChannel
+
+class MyWebEnginePage(QWebEnginePage):
+    def acceptNavigationRequest(self, url, _type, isMainFrame):
+        if _type == QWebEnginePage.NavigationTypeLinkClicked:
+            # This will be triggered when a link is clicked
+            self.view().setUrl(url)  # navigate to the url
+            return False  # Prevent the default behavior (open in new window)
+        return super().acceptNavigationRequest(url, _type, isMainFrame)
+    
+#class CallHandler(QObject):
+   # @pyqtSlot(str)
+    #def onCardClicked(self, href):
+        #print(f"Card clicked with href: {href}")
+        # Here, you can implement any logic you want with the received href,
+        # for instance, loading a new page in the browser.
+
 
 # Custom class for creating menu as our input
 class CustomMenu(QWidget):
@@ -243,6 +261,11 @@ class MyBrowser(QMainWindow):
         self.showMaximized()
         self.lang_translator = Translator()
         
+        # Initialization pygame mixer 
+        pygame.mixer.init()
+        # Sound control attribute
+        self.sound_for_button = None
+        
         # Disable all native parameter for Tooltip to set my own type
         QApplication.setEffectEnabled(Qt.UI_FadeTooltip, False)
         QApplication.setEffectEnabled(Qt.UI_AnimateTooltip, False)
@@ -304,7 +327,7 @@ class MyBrowser(QMainWindow):
                 font-size: {font_size_info}px;
                 font-weight: {font_weight_info};
                 font-family: {font_family_info};
-                width: {buttons_width_info}px;
+                width: 200px;
                 height: {buttons_height_info}px;
                 icon-size: {self.buttons_icon_width_info}px {self.buttons_icon_height_info}px;
             }}
@@ -458,7 +481,7 @@ class MyBrowser(QMainWindow):
         translate_label.setPixmap(translate_icon.pixmap(QSize(self.buttons_icon_width_info,self.buttons_icon_height_info)))
         translate_layout.addWidget(translate_label)
         # Text fo reload button
-        translate_text_label = QLabel("EN/CZ/DE",self.translate_btn)
+        translate_text_label = QLabel("En/Cz/De",self.translate_btn)
         translate_layout.addWidget(translate_text_label)
         # Change to hand when click cursor
         self.translate_btn.setCursor(Qt.PointingHandCursor)
@@ -572,7 +595,7 @@ class MyBrowser(QMainWindow):
         widget.hover_timer.setInterval(hover_time)
         # Run only one times when hover
         widget.hover_timer.setSingleShot(True)
-        widget.hover_timer.timeout.connect(lambda: self.play_sound(path_to_sound))
+        widget.hover_timer.timeout.connect(lambda: self.play_sound_for_button(path_to_sound))
         # Install event to widget -> Event is comefrom eventFilter
         widget.installEventFilter(self)
     
@@ -582,19 +605,29 @@ class MyBrowser(QMainWindow):
             watched.hover_timer.start()
         elif event.type() == QEvent.HoverLeave:
             watched.hover_timer.stop()
+            # Stop sound immediately
+            self.stop_sound_for_button()
         return super().eventFilter(watched, event)
     
     # Play a sound, which is stored on SWEB_config.json
-    def play_sound(self, path_to_sound):
-        # Ensure the file exists before trying to play it.
-        if os.path.exists(path_to_sound):
-            if path_to_sound.endswith('.wav'):
-                subprocess.run(["aplay", path_to_sound])
-            elif path_to_sound.endswith('.mp3'):
-                subprocess.run(["mpg123", path_to_sound])
-        else:
-            print(f"Sound file not found in: {path_to_sound}")
-
+    def play_sound_for_button(self, path_to_sound):
+        # Ensure the file exists before playing it
+        if not os.path.exists(path_to_sound):
+            print(f"Sound file not found: {path_to_sound}")
+            return
+        try:
+            # Load and play the sound file
+            self.sound_for_button = pygame.mixer.Sound(path_to_sound)
+            self.sound_for_button.play()
+        except Exception as exc:
+            print(f"Failed to play sound: {str(exc)}")
+            
+    # Stop sound immediately when button is leaved hover
+    def stop_sound_for_button(self):
+        if self.sound_for_button:
+            self.sound_for_button.stop()
+            self.sound_for_button = None
+        
     # This method is set for visible and invisible URL bar
     def toggle_url_toolbar(self):
         # Toggle visibility of the URL toolbar
@@ -634,6 +667,7 @@ class MyBrowser(QMainWindow):
     def navigate_home(self):
         html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'homepage.html')
         self.browser.setUrl(QUrl.fromLocalFile(html_path))
+        self.url_bar.setText('')
         
     # Show block message when User connect to web from Phishing list
     def show_blocked_message(self, url):

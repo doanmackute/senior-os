@@ -6,7 +6,12 @@ class Translator:
         self.language_keys = ["en","cz","de"]
         self.current_language = self.langConfigDB["language"]["default_language"]
         # Set current language is english =0 , CZ = 1, DE = 2
-        self.current_language_index = 0
+        if(self.current_language) == "en":
+            self.current_language_index = 0
+        elif self.current_language == "cz":
+            self.current_language_index = 1
+        else:
+            self.current_language_index = 2
 
     def toggle_language(self):
         # Increase the index to change the language
