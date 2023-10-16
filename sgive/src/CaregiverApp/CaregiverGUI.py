@@ -1,9 +1,10 @@
 from tkinter import *  # gui framework
-import configurationActions as ryuconf    # mine thing for json actions
+import configurationActions as ryuconf  # mine thing for json actions
 from screeninfo import get_monitors  # get all monitors
 from configurationActions import readJsonConfig  # mine thing for json actions
 import logging  # loging
 import re  # regex
+
 """
 Author: RYUseless
 Github: https://github.com/RYUseless
@@ -12,6 +13,7 @@ Version: 0.0.9(Alpha)
 
 logger = logging.getLogger(__file__)
 logger.info("initiated logging")
+
 
 class menuBarButtons:
     def __init__(self, menuFrame: Frame, root: Tk, heightDivisor: int, height: int, width: int):
@@ -205,6 +207,7 @@ class showGlobalConfigFrame:
     def __init__(self, frame: Frame, width, height):
         self.frame = frame
         self.changeLanguageDict = {}
+        self.changeLanguageAlertDict = {}
         self.width = width
         self.height = height
         self.widthLabel = width / 2
@@ -228,6 +231,7 @@ class showGlobalConfigFrame:
         self.colorButtonSelected = None
         self.delaySubmit = None
         self.pickedButton = None
+        self.pickedButton2 = None
         self.thicknessButtonSelected = None
 
         # calls:
@@ -499,6 +503,16 @@ class showGlobalConfigFrame:
     OS alertSoundLanguage------------------------------------------------------------------------------------------------------
     """
 
+    def changeColorLanguageAlert(self, idLanButton):  # LANGUAGE SELECTION
+        buttonSelectedColor = "#5c6447"
+        if not self.pickedButton2 is None:
+            self.changeLanguageAlertDict[self.pickedButton2].configure(bg="#D3D3D3", activebackground="#bdbbbb")
+            self.changeLanguageAlertDict[idLanButton].configure(bg=buttonSelectedColor, activebackground=buttonSelectedColor)
+            self.pickedButton2 = idLanButton
+        else:
+            self.changeLanguageAlertDict[idLanButton].configure(bg=buttonSelectedColor, activebackground=buttonSelectedColor)
+            self.pickedButton2 = idLanButton
+
     def OSalertSound(self):
         self.Xposition = 0
         self.Yposition = self.Yposition + self.heightWidgets + 10
@@ -506,6 +520,30 @@ class showGlobalConfigFrame:
         colorModeLabel = Label(self.frame, text="Alert sound language: ")
         colorModeLabel['font'] = self.fontGet
         colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
+
+        self.Xposition = self.Xposition + self.widthLabel + 10
+
+        counterLangCount = 1
+        self.soundVar = StringVar(value=ryuconf.readJsonConfig("GlobalConfiguration", "alertSoundLanguage"))
+        for name in self.options:
+            def getName(n=name, c=counterLangCount):
+                self.soundVar.get()  # needs to be here to show picked selection
+                self.changeColorLanguageAlert(c)
+                ryuconf.editConfig("GlobalConfiguration", "alertSoundLanguage", n)
+
+            self.changeLanguageAlertDict[counterLangCount] = Radiobutton(self.frame, text=name, variable=self.soundVar,
+                                                                         value=name)
+            self.changeLanguageAlertDict[counterLangCount]['font'] = self.fontGet
+            self.changeLanguageAlertDict[counterLangCount].configure(bg="#D3D3D3", activebackground="#bdbbbb")
+            self.changeLanguageAlertDict[counterLangCount]['command'] = getName
+            if counterLangCount == 1:
+                self.changeLanguageAlertDict[counterLangCount].place(x=self.Xposition, y=self.Yposition,
+                                                                     width=self.widthButton, height=self.heightWidgets)
+            else:
+                self.Xposition = self.Xposition + self.widthButton + 10
+                self.changeLanguageAlertDict[counterLangCount].place(x=self.Xposition, y=self.Yposition,
+                                                                     width=self.widthButton, height=self.heightWidgets)
+            counterLangCount += 1
 
     """
     OS alertSoundLanguage END-----------------------------------------------------------------------------------------------------
@@ -577,7 +615,8 @@ class showGlobalConfigFrame:
 
     OS fontThickness------------------------------------------------------------------------------------------------------
     """
-    def changedColor(self,buttonID):
+
+    def changedColor(self, buttonID):
         buttonSelectedColor = "#5c6447"
         if not self.thicknessButtonSelected is None:
             self.thicknessButtonSelected.configure(bg="#D3D3D3", activebackground="#bdbbbb")
@@ -600,7 +639,7 @@ class showGlobalConfigFrame:
         boldButton = Radiobutton(self.frame, text="bold", variable=self.thicknessVar, value="bold")
         boldButton['command'] = lambda: [ryuconf.editConfig("GlobalConfiguration",
                                                             "fontThickness", self.thicknessVar.get()),
-                                                            self.changedColor(boldButton)]
+                                         self.changedColor(boldButton)]
         boldButton['font'] = self.fontGet
         self.Xposition = self.Xposition + self.widthLabel + 10
         boldButton.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
@@ -608,7 +647,7 @@ class showGlobalConfigFrame:
         slimButton = Radiobutton(self.frame, text="slim", variable=self.thicknessVar, value="")
         slimButton['command'] = lambda: [ryuconf.editConfig("GlobalConfiguration", "fontThickness",
                                                             self.thicknessVar.get()),
-                                                            self.changedColor(slimButton)]
+                                         self.changedColor(slimButton)]
         slimButton['font'] = self.fontGet
         self.Xposition = self.Xposition + self.widthButton + 10
         slimButton.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
@@ -629,35 +668,47 @@ class showGlobalConfigFrame:
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    def restoreGlobalConfigs(self):  # RESTORES ALL SELECTED BUTTONS
+    def restoreColors(self):  # RESTORES ALL SELECTED BUTTONS
         getWhereConfigIs = ryuconf.readJsonConfig("pathToConfig", "path")
         ryuconf.caregiverAppConfig(getWhereConfigIs)  # generates default config.json
         self.delaySubmit.configure(bg=self.normalColor, activebackground=self.normalColor)
+        self.fontSubmit.configure(bg=self.normalColor, activebackground=self.normalColor)
+        self.labelSubmit.configure(bg=self.normalColor, activebackground=self.normalColor)
         self.colorSubmit.configure(bg=self.normalColor, activebackground=self.normalColor)
         if not self.pickedButton is None:
             self.changeLanguageDict[self.pickedButton].configure(bg=self.normalColor, activebackground=self.normalColor)
+        if not self.pickedButton2 is None:
+            self.changeLanguageAlertDict[self.pickedButton2].configure(bg=self.normalColor, activebackground=self.normalColor)
         if not self.colorButtonSelected is None:
             self.colorButtonSelected.configure(bg=self.normalColor, activebackground=self.normalColor)
+        if not self.thicknessButtonSelected is None:
+            self.thicknessButtonSelected.configure(bg=self.normalColor, activebackground=self.normalColor)
         else:
             return
+
+    def resetActions(self):
+        self.errorLabel.place_forget()
+        self.radioVar.set(ryuconf.readJsonConfig("GlobalConfiguration", "language"))
+        self.radioVar2.set(ryuconf.readJsonConfig("GlobalConfiguration", "colorMode"))
+        self.soundVar.set(ryuconf.readJsonConfig("GlobalConfiguration", "alertSoundLanguage"))
+        self.thicknessVar.set(value=ryuconf.readJsonConfig("GlobalConfiguration", "fontThickness"))
+        self.inputText.delete("1.0", "end")
+        self.inputText.insert(1.0, ryuconf.readJsonConfig("GlobalConfiguration", "soundDelay"))
+        self.inputHex.delete(1.0, "end")
+        self.inputHex.insert(1.0, ryuconf.readJsonConfig("GlobalConfiguration", "alertColor"))
+        self.inputlabelFontSize.delete(1.0, "end")
+        self.inputlabelFontSize.insert(1.0, ryuconf.readJsonConfig("GlobalConfiguration", "labelFontSize"))
+        self.inputFont.delete(1.0, "end")
+        self.inputFont.insert(1.0, ryuconf.readJsonConfig("GlobalConfiguration", "fontSize"))
+        # final action
+        logger.info("resetting config")
 
     def OSresetButton(self):
         self.Xposition = (self.width / 2) - ((self.width / 5) / 2)
         self.Yposition = self.Yposition + self.heightWidgets + 10
         restore = Button(self.frame, text="RESTORE TO DEFAULT SETTINGS")
         restore.place(x=self.Xposition, y=self.Yposition, width=self.width / 5, height=self.heightWidgets)
-        # behold the worst thing in the code: (eventually I will change this, but for now it works :))
-        restore['command'] = lambda: [self.restoreGlobalConfigs(), self.errorLabel.place_forget(),
-                                      self.radioVar.set(ryuconf.readJsonConfig("GlobalConfiguration", "language")),
-                                      self.radioVar2.set(ryuconf.readJsonConfig("GlobalConfiguration", "colorMode")),
-                                      self.inputText.delete("1.0", "end"),
-                                      self.inputText.insert(1.0,
-                                                            ryuconf.readJsonConfig("GlobalConfiguration",
-                                                                                   "soundDelay")),
-                                      self.inputHex.delete(1.0, "end"),
-                                      self.inputHex.insert(1.0,
-                                                           ryuconf.readJsonConfig("GlobalConfiguration", "alertColor")),
-                                      logger.info("resetting config")]
+        restore['command'] = lambda: [self.restoreColors(), self.resetActions()]
 
 
 class AppBase:
