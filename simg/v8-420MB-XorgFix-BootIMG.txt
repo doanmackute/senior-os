@@ -1,6 +1,6 @@
 apt-get install live-build
 
-mkdir v9-Konzultace2 && cd v9-Konzultace2
+mkdir v9-Konzultace && cd v9-Konzultace
 cp -r /usr/share/doc/live-build/examples/auto/ auto
 nano auto/config 
 
@@ -13,6 +13,7 @@ set -e
 
 lb config noauto \
 	--bootappend-live "boot=live components nocomponents=xinit parameters hostname=LIVE" \
+	--iso-publisher "Lada Struziakova" \
 	"${@}"
 
 ###################################################################
@@ -66,6 +67,35 @@ rm -rf /home/user/palemoon-32.4.0.linux-x86_64-gtk2.tar.xz
 
 cp -r /usr/share/live/build/bootloaders/syslinux* config/bootloaders/
 cp -r /usr/share/live/build/bootloaders/isolinux/ config/bootloaders/
+nano config/bootloaders/syslinux_common/menu.cfg 
+
+###################################################################
+###	CONTENT OF menu.cfg					###
+
+menu hshift 0
+menu width 82
+menu cmdlinerow 16
+menu tabmsgrow 18
+menu tabmsg Press ENTER to boot or TAB to edit a menu entry
+
+menu title Boot menu 
+include stdmenu.cfg
+include live.cfg
+@OPTIONAL_INSTALLER_INCLUDE@
+menu begin utilities
+	menu label ^Utilities
+	menu title Utilities
+	include stdmenu.cfg
+	label mainmenu
+		menu label ^Back..
+		menu exit
+	include utilities.cfg
+menu end
+
+menu clear
+
+###################################################################
+
 nano config/bootloaders/syslinux_common/stdmenu.cfg 
 
 ###################################################################
@@ -79,15 +109,10 @@ menu color hotsel	1;7;37;40 #ffffffff #76a1d0ff *
 menu color tabmsg	* #ffffffff #00000000 *
 menu color help		37;40 #ffdddd00 #00000000 none
 menu vshift 12
-menu hshift 30
-menu width 50
+menu hshift 25
+menu width 45
 menu rows 10
 menu helpmsgrow 15
-# The command line must be at least one line from the bottom.
-menu cmdlinerow 16
-menu timeoutrow 16
-menu tabmsgrow 18
-menu tabmsg Press ENTER to boot or TAB to edit a menu entry
 
 ###################################################################
 
