@@ -75,6 +75,13 @@ def caregiverAppConfig(path):
             "fontFamily": "Helvetica",
             "macAddress": getMac(),
         },
+        "GUI_template" : {
+            "num_of_menu_buttons": 2,
+            "num_of_opt_on_frame": 4,
+            "padx_value": 5,
+            "height_divisor": 4.5,
+            "width_divisor": 5,
+        },
         'careConf': {
             "fg": 5,
             "bg": 5,

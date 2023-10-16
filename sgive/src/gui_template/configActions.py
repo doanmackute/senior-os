@@ -13,7 +13,7 @@ def temporaryGetPath():
 def configExistCheck(givenVersion):
     pathToJsonConf = temporaryGetPath()
     if os.path.exists(pathToJsonConf):
-        if os.path.isfile(os.path.join(pathToJsonConf,'config.json')):
+        if os.path.isfile(os.path.join(pathToJsonConf,'configOLD.json')):
             currentVersion = jsonRed('Version', "configVersion")
             if not currentVersion == givenVersion:
                 _jsonWrite(givenVersion)
@@ -55,14 +55,14 @@ def _jsonWrite(currentVersion):
         }
     }
     json_object = json.dumps(dictionary, indent=4)
-    with open(f"{temporaryGetPath()}/config.json", "w+") as outfile:
+    with open(f"{temporaryGetPath()}/configOLD.json", "w+") as outfile:
         outfile.write(json_object)
 
 
 def jsonRed(key, value):
     path = temporaryGetPath()
     if os.path.exists(path):  # checks for the conf file, if there is any
-        with open(os.path.join(path, 'config.json'), "r") as file:
+        with open(os.path.join(path, 'configOLD.json'), "r") as file:
             jsonData = json.load(file)
         return jsonData[key][value]
     else:
