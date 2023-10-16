@@ -1,6 +1,13 @@
 from tkinter import *
 import guiTemplate as temp
-import sgive.src.gui_template.configActions as act
+try:
+    import sgive.src.gui_template.configActions as act
+except ImportError:
+    print("error")
+try:
+    import configActions as act
+except ImportError:
+    print("Error")
 
 if __name__ == '__main__':
     _currentVersionOfConfig = 0.2

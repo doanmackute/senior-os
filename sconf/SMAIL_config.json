@@ -26,7 +26,7 @@
         "Person5": "../sconf/images/SMAIL_CL_PERSON_5.png"
     },
 
-    "lang": "en",
+    "lang": "de",
     "timer": 5000,
 
     "text": {
@@ -37,6 +37,8 @@
         "smail_en_recipientLabel": "To: ",
         "smail_en_subjectLabel": "Subject: ",
         "smail_en_messageLabel": "Message: ",
+        "smail_en_from": "From: ",
+        "smail_en_date": "Date: ",
         "smail_cz_exitButton": "Odejít",
         "smail_cz_sendEmailButton": "Odeslat Email",
         "smail_cz_sendToButton": "Komu",
@@ -44,13 +46,17 @@
         "smail_cz_recipientLabel": "Příjemce: ",
         "smail_cz_subjectLabel": "Předmět: ",
         "smail_cz_messageLabel": "Zpráva: ",
+        "smail_cz_from": "Od: ",
+        "smail_cz_date": "Datum: ",
         "smail_de_exitButton": "Verlassen",
         "smail_de_sendEmailButton": "Email Senden",
         "smail_de_sendToButton": "Senden An",
         "smail_de_inboxLabel": "Posteingang",
         "smail_de_recipientLabel": "An: ",
         "smail_de_subjectLabel": "Betreff: ",
-        "smail_de_messageLabel": "Nachricht: "
+        "smail_de_messageLabel": "Nachricht: ",
+        "smail_de_from": "Von: ",
+        "smail_de_date": "Datum: "
     },
 
     "audio": {

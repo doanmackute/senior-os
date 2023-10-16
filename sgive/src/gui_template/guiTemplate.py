@@ -3,7 +3,8 @@ Written by: RYUseless
 """
 import tkinter
 from tkinter import *
-import sgive.src.gui_template.configActions as JS
+import configActions as JS
+# import sgive.src.gui_template.configActions as JS
 from screeninfo import get_monitors
 
 
