@@ -1,13 +1,17 @@
-from tkinter import *
-import configurationActions as ryuconf
-from screeninfo import get_monitors
-from configurationActions import readJsonConfig
-import logging
-import re
+from tkinter import *  # gui framework
+import configurationActions as ryuconf    # mine thing for json actions
+from screeninfo import get_monitors  # get all monitors
+from configurationActions import readJsonConfig  # mine thing for json actions
+import logging  # loging
+import re  # regex
+"""
+Author: RYUseless
+Github: https://github.com/RYUseless
+Version: 0.0.9(Alpha)
+"""
 
 logger = logging.getLogger(__file__)
 logger.info("initiated logging")
-
 
 class menuBarButtons:
     def __init__(self, menuFrame: Frame, root: Tk, heightDivisor: int, height: int, width: int):
@@ -25,8 +29,8 @@ class menuBarButtons:
         self.lastSelectedButton = None
         self.pickedButton = None
 
-    def selectedButton(self,x):
-        selectedColor = "#676767"
+    def selectedButton(self, x):
+        selectedColor = "gray"  # TODO: lehce teplejší šedou než jest tato
         if self.lastSelectedButton is None:
             self.buttonDictionary[x]['activebackground'] = selectedColor  # selected
             self.buttonDictionary[x]['bg'] = selectedColor  # selected
@@ -42,17 +46,17 @@ class menuBarButtons:
         counter = 0
         self.options.append("EXIT")  # add exit as a last button
         for i in self.options:
-            def getButtonNum(y=counter):
+            def getButtonNum(y=counter, name=i):
                 self.selectedButton(y)
-                if y == 0:
+                if name == "Global\nconfig":
                     self.CallConfigFrame.GlobalConfigCall(y + 1)
-                elif y == 1:
+                elif name == "Mail\nconfig":
                     self.CallConfigFrame.SmailConfigCall(y + 1)
-                elif y == 2:
+                elif name == "Web\nconfig":
                     self.CallConfigFrame.swebConfigCall(y + 1)
-                elif y == 3:
+                elif name == "LOGS":
                     self.CallConfigFrame.logConfigCall(y + 1)
-                elif y == int(len(self.options) - 1):
+                elif name == "EXIT":
                     exit(0)
 
             self.buttonDictionary[counter] = Button(self.menuFrame)
@@ -62,7 +66,7 @@ class menuBarButtons:
             self.buttonDictionary[counter]['relief'] = 'solid'
             self.buttonDictionary[counter]['command'] = getButtonNum
             self.buttonDictionary[counter]['font'] = "Helvetica 36 bold"
-            self.buttonDictionary[counter]['borderwidth'] = 2
+            self.buttonDictionary[counter]['borderwidth'] = 1.5
             self.buttonDictionary[counter]['highlightbackground'] = "black"
 
             if counter == 0:
@@ -224,6 +228,8 @@ class showGlobalConfigFrame:
         self.colorButtonSelected = None
         self.delaySubmit = None
         self.pickedButton = None
+        self.thicknessButtonSelected = None
+
         # calls:
         self.OSpickScreen()
         self.OSlanguage()
@@ -256,13 +262,13 @@ class showGlobalConfigFrame:
         while counter < len(monitors):
             buttonDict.append(counter)
             counter += 1
-        self.radioVarScreens = IntVar(value=ryuconf.readJsonConfig("GlobalConfiguration","numOfScreen"))
+        self.radioVarScreens = IntVar(value=ryuconf.readJsonConfig("GlobalConfiguration", "numOfScreen"))
         for id in buttonDict:
             def getNum(i=id):
                 print(i)
-                ryuconf.editConfig("GlobalConfiguration","numOfScreen",i)
+                ryuconf.editConfig("GlobalConfiguration", "numOfScreen", i)
 
-            buttonThing[id] = Radiobutton(self.frame, text=f"monitor č.{id+1}", variable=self.radioVarScreens,
+            buttonThing[id] = Radiobutton(self.frame, text=f"monitor č.{id + 1}", variable=self.radioVarScreens,
                                           value=id)
             buttonThing[id]['font'] = self.fontGet
             buttonThing[id]['command'] = getNum
@@ -369,24 +375,39 @@ class showGlobalConfigFrame:
     OS delay time------------------------------------------------------------------------------------------------------
     """
 
-    def checkIfInputIsNumber(self, timeInput, xPos, yPos, whichConfig):
-        global timeInt
+    def checkIfInputIsNumber(self, givenInput, xPos, yPos, whichConfig):
+        global inputInt
         try:
-            timeInt = int(timeInput)
+            inputInt = int(givenInput)
         except ValueError:
-            self.delaySubmit.configure(bg=self.normalColor,
-                                       activebackground=self.normalColor)  # change submit button color barch
+            if whichConfig == 1:
+                self.delaySubmit.configure(bg=self.normalColor,
+                                           activebackground=self.normalColor)  # change submit button color barch
+            elif whichConfig == 2:
+                self.fontSubmit.configure(bg=self.normalColor,
+                                          activebackground=self.normalColor)  # change submit button color barch
+            elif whichConfig == 3:
+                self.labelSubmit.configure(bg=self.normalColor,
+                                           activebackground=self.normalColor)  # change submit button color barch
             iks = xPos + self.widthButton + 10
-            self.inputError['text'] = f"'{timeInput}' is not a number, value must be number!"
+            self.inputError['text'] = f"'{givenInput}' is not a number, value must be number!"
             errorLabelWidth = self.width - (2 * self.widthButton + self.widthLabel + 30)
             self.inputError.place(x=iks, y=yPos, width=errorLabelWidth, height=self.heightWidgets)
-            logger.error(f"Value '{timeInput}' is not a number, value must be number!")
+            logger.error(f"Value '{givenInput}' is not a number, value must be number!")
             return
-
-        ryuconf.editConfig("GlobalConfiguration", "soundDelay", timeInt)
+        # 1 - soundDelay
+        # 2 - fontSize
+        if whichConfig == 1:
+            ryuconf.editConfig("GlobalConfiguration", "soundDelay", inputInt)
+            self.delaySubmit.configure(bg=self.activeColor, activebackground=self.activeColor)
+        elif whichConfig == 2:
+            ryuconf.editConfig("GlobalConfiguration", "fontSize", inputInt)
+            self.fontSubmit.configure(bg=self.activeColor, activebackground=self.activeColor)
+        elif whichConfig == 3:
+            ryuconf.editConfig("GlobalConfiguration", "labelFontSize", inputInt)
+            self.labelSubmit.configure(bg=self.activeColor, activebackground=self.activeColor)
 
         self.inputError.place_forget()
-        self.delaySubmit.configure(bg=self.activeColor, activebackground=self.activeColor)
 
     def OSdelayTime(self):
         self.Xposition = 0
@@ -413,7 +434,7 @@ class showGlobalConfigFrame:
         getCurrentY = self.Yposition
 
         self.delaySubmit['command'] = lambda: self.checkIfInputIsNumber(self.inputText.get(1.0, 'end-1c'), getCurrentX,
-                                                                        getCurrentY, "soundDelay")
+                                                                        getCurrentY, 1)
 
     """
     OS DELAY END-----------------------------------------------------------------------------------------------------
@@ -496,9 +517,27 @@ class showGlobalConfigFrame:
         self.Xposition = 0
         self.Yposition = self.Yposition + self.heightWidgets + 10
 
-        colorModeLabel = Label(self.frame, text="Font size: ")
-        colorModeLabel['font'] = self.fontGet
-        colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
+        fontSizeLabel = Label(self.frame, text="Font size: ")
+        fontSizeLabel['font'] = self.fontGet
+        fontSizeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
+
+        self.inputFont = Text(self.frame)
+        self.inputFont['font'] = self.fontInputThing
+        defalultDelayValue = ryuconf.readJsonConfig("GlobalConfiguration", "fontSize")
+        self.inputFont.insert(1.0, defalultDelayValue)
+        self.Xposition = self.Xposition + self.widthLabel + 10
+        self.inputFont.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
+
+        self.fontSubmit = Button(self.frame, text="submit")
+        self.fontSubmit['font'] = self.fontGet
+        self.Xposition = self.Xposition + self.widthButton + 10
+        self.fontSubmit.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
+
+        getCurrentX = self.Xposition
+        getCurrentY = self.Yposition
+
+        self.fontSubmit['command'] = lambda: self.checkIfInputIsNumber(self.inputFont.get(1.0, 'end-1c'), getCurrentX,
+                                                                       getCurrentY, 2)
 
     """
     OS fontSize END-----------------------------------------------------------------------------------------------------
@@ -514,11 +553,39 @@ class showGlobalConfigFrame:
         colorModeLabel['font'] = self.fontGet
         colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
+        self.inputlabelFontSize = Text(self.frame)
+        self.inputlabelFontSize['font'] = self.fontInputThing
+        defalultDelayValue = ryuconf.readJsonConfig("GlobalConfiguration", "labelFontSize")
+        self.inputlabelFontSize.insert(1.0, defalultDelayValue)
+        self.Xposition = self.Xposition + self.widthLabel + 10
+        self.inputlabelFontSize.place(x=self.Xposition, y=self.Yposition, width=self.widthButton,
+                                      height=self.heightWidgets)
+
+        self.labelSubmit = Button(self.frame, text="submit")
+        self.labelSubmit['font'] = self.fontGet
+        self.Xposition = self.Xposition + self.widthButton + 10
+        self.labelSubmit.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
+
+        getCurrentX = self.Xposition
+        getCurrentY = self.Yposition
+
+        self.labelSubmit['command'] = lambda: self.checkIfInputIsNumber(self.inputlabelFontSize.get(1.0, 'end-1c'),
+                                                                        getCurrentX, getCurrentY, 3)
+
     """
     OS labelFontSize END-----------------------------------------------------------------------------------------------------
 
     OS fontThickness------------------------------------------------------------------------------------------------------
     """
+    def changedColor(self,buttonID):
+        buttonSelectedColor = "#5c6447"
+        if not self.thicknessButtonSelected is None:
+            self.thicknessButtonSelected.configure(bg="#D3D3D3", activebackground="#bdbbbb")
+            buttonID.configure(bg=buttonSelectedColor, activebackground=buttonSelectedColor)
+            self.thicknessButtonSelected = buttonID
+        else:
+            buttonID.configure(bg=buttonSelectedColor, activebackground=buttonSelectedColor)
+            self.thicknessButtonSelected = buttonID
 
     def OSfontThicckness(self):
         self.Xposition = 0
@@ -527,6 +594,24 @@ class showGlobalConfigFrame:
         colorModeLabel = Label(self.frame, text="Text thickness: ")
         colorModeLabel['font'] = self.fontGet
         colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
+
+        self.thicknessVar = StringVar(value=ryuconf.readJsonConfig("GlobalConfiguration", "fontThickness"))
+        # light mode
+        boldButton = Radiobutton(self.frame, text="bold", variable=self.thicknessVar, value="bold")
+        boldButton['command'] = lambda: [ryuconf.editConfig("GlobalConfiguration",
+                                                            "fontThickness", self.thicknessVar.get()),
+                                                            self.changedColor(boldButton)]
+        boldButton['font'] = self.fontGet
+        self.Xposition = self.Xposition + self.widthLabel + 10
+        boldButton.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
+        # dark mode
+        slimButton = Radiobutton(self.frame, text="slim", variable=self.thicknessVar, value="")
+        slimButton['command'] = lambda: [ryuconf.editConfig("GlobalConfiguration", "fontThickness",
+                                                            self.thicknessVar.get()),
+                                                            self.changedColor(slimButton)]
+        slimButton['font'] = self.fontGet
+        self.Xposition = self.Xposition + self.widthButton + 10
+        slimButton.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
 
     """
     OS fontThickness END-----------------------------------------------------------------------------------------------------
