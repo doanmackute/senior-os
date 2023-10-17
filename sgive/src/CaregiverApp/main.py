@@ -5,7 +5,7 @@ import CaregiverGUI as ryuGUI
 import logging
 
 logging.basicConfig(
-    filename=os.path.join(ryuconf.temporaryGetPath(), 'CaregiverAPP.log'),
+    filename=os.path.join(ryuconf.temporaryGetPath(), 'EXAMPLE.log'),
     level=logging.INFO,
     format="%(asctime)s : %(levelname)s -> %(module)s %(funcName)s %(lineno)s : %(message)s",
     filemode='w+',
