@@ -68,7 +68,7 @@ def caregiverAppConfig(path):
             "colorMode": "Light",
             "soundDelay": 5,
             "alertColor": "#AAFF00",
-            "alertSoundLanguage": "english",
+            "alertSoundLanguage": "English",
             "fontSize": 36,
             "labelFontSize": 12,
             "fontThickness": "bold",
