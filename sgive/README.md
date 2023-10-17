@@ -5,7 +5,7 @@ link to both projects: <br>
 
 ## TODO:
 - [x] View logs
-- [ ] Global configuration
+- [x] Global configuration
 - [ ] Smail config
 - [ ] Web config
 
