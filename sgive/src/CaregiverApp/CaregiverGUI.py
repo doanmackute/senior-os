@@ -213,9 +213,10 @@ class showGlobalConfigFrame:
         self.widthLabel = width / 2
         self.widthButton = width / 10
         self.heightDivisor = ryuconf.readJsonConfig("careConf", "heightDivisor")
-        self.heightWidgets = (height / self.heightDivisor) / 2.1
+        self.spacer = 10
+        self.heightWidgets = ((height - (height / self.heightDivisor)) / 11) - self.spacer
         self.Xposition = 0
-        self.Yposition = 15
+        self.Yposition = self.spacer
         self.activeColor = "#5c6447"
         self.normalColor = "#D3D3D3"
         self.options = ryuconf.readJsonConfig("careConf", "LanguageOptions")
@@ -235,17 +236,17 @@ class showGlobalConfigFrame:
         self.thicknessButtonSelected = None
 
         # calls:
-        self.OSpickScreen()
-        self.OSlanguage()
-        self.OScolorScheme()
-        self.OSdelayTime()
-        self.OSalertColor()
-        self.OSalertSound()
-        self.OSfontSize()
-        self.OSlabelFontSize()
-        self.OSfontThicckness()
-        self.OSfontFamily()
-        self.OSresetButton()
+        self.OSpickScreen()  # choose which screen res you want
+        self.OSlanguage()  # choose language for applications
+        self.OSalertSound()  # choose alert language for apps
+        self.OScolorScheme()  # light or dark scheme
+        self.OSalertColor()  # color of widget, when selected
+        self.OSdelayTime()  # delay before notification starts
+        self.OSfontSize()  # size of text
+        self.OSlabelFontSize()  # size of text, but label
+        self.OSfontThicckness()  # t h i c c
+        self.OSfontFamily()  # family name
+        self.OSresetButton()  # r e s e t
 
     """
     OS screen -------------------------------------------------------------------------------------------------------
@@ -257,7 +258,7 @@ class showGlobalConfigFrame:
         colorModeLabel['font'] = self.fontGet
         colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
-        self.Xposition = self.Xposition + self.widthLabel + 10
+        self.Xposition = self.Xposition + self.widthLabel + self.spacer
 
         buttonThing = {}
         buttonDict = []
@@ -280,7 +281,7 @@ class showGlobalConfigFrame:
                 buttonThing[id].place(x=self.Xposition, y=self.Yposition,
                                       width=self.widthButton, height=self.heightWidgets)
             else:
-                self.Xposition = self.Xposition + self.widthButton + 10
+                self.Xposition = self.Xposition + self.widthButton + self.spacer
                 buttonThing[id].place(x=self.Xposition, y=self.Yposition,
                                       width=self.widthButton, height=self.heightWidgets)
 
@@ -301,13 +302,13 @@ class showGlobalConfigFrame:
 
     def OSlanguage(self):
         self.Xposition = 0
-        self.Yposition = self.Yposition + self.heightWidgets + 10
+        self.Yposition = self.Yposition + self.heightWidgets + self.spacer
 
         languageLabel = Label(self.frame, text="OS language:")
         languageLabel['font'] = self.fontGet
         languageLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
-        self.Xposition = self.Xposition + self.widthLabel + 10
+        self.Xposition = self.Xposition + self.widthLabel + self.spacer
 
         counterLangCount = 1
         self.radioVar = StringVar(value=ryuconf.readJsonConfig("GlobalConfiguration", "language"))
@@ -326,7 +327,7 @@ class showGlobalConfigFrame:
                 self.changeLanguageDict[counterLangCount].place(x=self.Xposition, y=self.Yposition,
                                                                 width=self.widthButton, height=self.heightWidgets)
             else:
-                self.Xposition = self.Xposition + self.widthButton + 10
+                self.Xposition = self.Xposition + self.widthButton + self.spacer
                 self.changeLanguageDict[counterLangCount].place(x=self.Xposition, y=self.Yposition,
                                                                 width=self.widthButton, height=self.heightWidgets)
             counterLangCount += 1
@@ -349,7 +350,7 @@ class showGlobalConfigFrame:
 
     def OScolorScheme(self):
         self.Xposition = 0
-        self.Yposition = self.Yposition + self.heightWidgets + 10
+        self.Yposition = self.Yposition + self.heightWidgets + self.spacer
 
         colorModeLabel = Label(self.frame, text="System color scheme:")
         colorModeLabel['font'] = self.fontGet
@@ -362,7 +363,7 @@ class showGlobalConfigFrame:
             ryuconf.editConfig("GlobalConfiguration", "colorMode", self.radioVar2.get()),
             self.changeColorColorschemeSelection(whiteColorButton)]
         whiteColorButton['font'] = self.fontGet
-        self.Xposition = self.Xposition + self.widthLabel + 10
+        self.Xposition = self.Xposition + self.widthLabel + self.spacer
         whiteColorButton.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
         # dark mode
         BlackColorButton = Radiobutton(self.frame, text="Dark", variable=self.radioVar2, value="Dark")
@@ -370,7 +371,7 @@ class showGlobalConfigFrame:
             ryuconf.editConfig("GlobalConfiguration", "colorMode", self.radioVar2.get()),
             self.changeColorColorschemeSelection(BlackColorButton)]
         BlackColorButton['font'] = self.fontGet
-        self.Xposition = self.Xposition + self.widthButton + 10
+        self.Xposition = self.Xposition + self.widthButton + self.spacer
         BlackColorButton.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
 
     """
@@ -393,9 +394,9 @@ class showGlobalConfigFrame:
             elif whichConfig == 3:
                 self.labelSubmit.configure(bg=self.normalColor,
                                            activebackground=self.normalColor)  # change submit button color barch
-            iks = xPos + self.widthButton + 10
+            iks = xPos + self.widthButton + self.spacer
             self.inputError['text'] = f"'{givenInput}' is not a number, value must be number!"
-            errorLabelWidth = self.width - (2 * self.widthButton + self.widthLabel + 30)
+            errorLabelWidth = self.width - (2 * self.widthButton + self.widthLabel + 3*self.spacer)
             self.inputError.place(x=iks, y=yPos, width=errorLabelWidth, height=self.heightWidgets)
             logger.error(f"Value '{givenInput}' is not a number, value must be number!")
             return
@@ -415,7 +416,7 @@ class showGlobalConfigFrame:
 
     def OSdelayTime(self):
         self.Xposition = 0
-        self.Yposition = self.Yposition + self.heightWidgets + 10
+        self.Yposition = self.Yposition + self.heightWidgets + self.spacer
 
         soundDelayLabel = Label(self.frame,
                                 text="Alert delay (in seconds):")
@@ -426,12 +427,12 @@ class showGlobalConfigFrame:
         self.inputText['font'] = self.fontInputThing
         defalultDelayValue = ryuconf.readJsonConfig("GlobalConfiguration", "soundDelay")
         self.inputText.insert(1.0, defalultDelayValue)
-        self.Xposition = self.Xposition + self.widthLabel + 10
+        self.Xposition = self.Xposition + self.widthLabel + self.spacer
         self.inputText.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
 
         self.delaySubmit = Button(self.frame, text="submit")
         self.delaySubmit['font'] = self.fontGet
-        self.Xposition = self.Xposition + self.widthButton + 10
+        self.Xposition = self.Xposition + self.widthButton + self.spacer
         self.delaySubmit.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
 
         getCurrentX = self.Xposition
@@ -452,7 +453,7 @@ class showGlobalConfigFrame:
             self.colorSubmit.configure(bg=self.normalColor, activebackground=self.normalColor)
             self.errorLabel['text'] = f"'{hexInput}' needs to have 7 characters"
             logger.error(f"'{hexInput}' needs to have 7 characters")
-            iks = xPos + self.widthButton + 10
+            iks = xPos + self.widthButton + self.spacer
             errorLabelWidth = self.width - (self.widthButton + (self.widthLabel / 3) + self.widthLabel + 30)
             self.errorLabel.place(x=iks, y=yPos, width=errorLabelWidth, height=self.heightWidgets)
             return
@@ -467,13 +468,13 @@ class showGlobalConfigFrame:
             self.colorSubmit.configure(bg=self.normalColor, activebackground=self.normalColor)
             self.errorLabel['text'] = f"'{hexInput}' is not a HEX value in format '#123456'"
             logger.error(f"'{hexInput}' is not a HEX value in format '#123456'")
-            iks = xPos + self.widthButton + 10
+            iks = xPos + self.widthButton + self.spacer
             errorLabelWidth = self.width - (self.widthButton + (self.widthLabel / 3) + self.widthLabel + 30)
             self.errorLabel.place(x=iks, y=yPos, width=errorLabelWidth, height=self.heightWidgets)
 
     def OSalertColor(self):
         self.Xposition = 0
-        self.Yposition = self.Yposition + self.heightWidgets + 10
+        self.Yposition = self.Yposition + self.heightWidgets + self.spacer
 
         colorModeLabel = Label(self.frame, text="Alert color in hex (#12345): ")
         colorModeLabel['font'] = self.fontGet
@@ -483,12 +484,12 @@ class showGlobalConfigFrame:
         self.inputHex['font'] = self.fontInputThing
         defaultHexValue = ryuconf.readJsonConfig("GlobalConfiguration", "alertColor")
         self.inputHex.insert(1.0, defaultHexValue)
-        self.Xposition = self.Xposition + self.widthLabel + 10
+        self.Xposition = self.Xposition + self.widthLabel + self.spacer
         self.inputHex.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel / 3, height=self.heightWidgets)
 
         self.colorSubmit = Button(self.frame, text="submit")
         self.colorSubmit['font'] = self.fontGet
-        self.Xposition = self.Xposition + (self.widthLabel / 3) + 10
+        self.Xposition = self.Xposition + (self.widthLabel / 3) + self.spacer
         self.colorSubmit.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
 
         getCurrentXforHex = self.Xposition
@@ -515,13 +516,13 @@ class showGlobalConfigFrame:
 
     def OSalertSound(self):
         self.Xposition = 0
-        self.Yposition = self.Yposition + self.heightWidgets + 10
+        self.Yposition = self.Yposition + self.heightWidgets + self.spacer
 
         colorModeLabel = Label(self.frame, text="Alert sound language: ")
         colorModeLabel['font'] = self.fontGet
         colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
 
-        self.Xposition = self.Xposition + self.widthLabel + 10
+        self.Xposition = self.Xposition + self.widthLabel + self.spacer
 
         counterLangCount = 1
         self.soundVar = StringVar(value=ryuconf.readJsonConfig("GlobalConfiguration", "alertSoundLanguage"))
@@ -540,7 +541,7 @@ class showGlobalConfigFrame:
                 self.changeLanguageAlertDict[counterLangCount].place(x=self.Xposition, y=self.Yposition,
                                                                      width=self.widthButton, height=self.heightWidgets)
             else:
-                self.Xposition = self.Xposition + self.widthButton + 10
+                self.Xposition = self.Xposition + self.widthButton + self.spacer
                 self.changeLanguageAlertDict[counterLangCount].place(x=self.Xposition, y=self.Yposition,
                                                                      width=self.widthButton, height=self.heightWidgets)
             counterLangCount += 1
@@ -553,7 +554,7 @@ class showGlobalConfigFrame:
 
     def OSfontSize(self):
         self.Xposition = 0
-        self.Yposition = self.Yposition + self.heightWidgets + 10
+        self.Yposition = self.Yposition + self.heightWidgets + self.spacer
 
         fontSizeLabel = Label(self.frame, text="Font size: ")
         fontSizeLabel['font'] = self.fontGet
@@ -563,12 +564,12 @@ class showGlobalConfigFrame:
         self.inputFont['font'] = self.fontInputThing
         defalultDelayValue = ryuconf.readJsonConfig("GlobalConfiguration", "fontSize")
         self.inputFont.insert(1.0, defalultDelayValue)
-        self.Xposition = self.Xposition + self.widthLabel + 10
+        self.Xposition = self.Xposition + self.widthLabel + self.spacer
         self.inputFont.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
 
         self.fontSubmit = Button(self.frame, text="submit")
         self.fontSubmit['font'] = self.fontGet
-        self.Xposition = self.Xposition + self.widthButton + 10
+        self.Xposition = self.Xposition + self.widthButton + self.spacer
         self.fontSubmit.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
 
         getCurrentX = self.Xposition
@@ -585,7 +586,7 @@ class showGlobalConfigFrame:
 
     def OSlabelFontSize(self):
         self.Xposition = 0
-        self.Yposition = self.Yposition + self.heightWidgets + 10
+        self.Yposition = self.Yposition + self.heightWidgets + self.spacer
 
         colorModeLabel = Label(self.frame, text="Label font size: ")
         colorModeLabel['font'] = self.fontGet
@@ -595,13 +596,13 @@ class showGlobalConfigFrame:
         self.inputlabelFontSize['font'] = self.fontInputThing
         defalultDelayValue = ryuconf.readJsonConfig("GlobalConfiguration", "labelFontSize")
         self.inputlabelFontSize.insert(1.0, defalultDelayValue)
-        self.Xposition = self.Xposition + self.widthLabel + 10
+        self.Xposition = self.Xposition + self.widthLabel + self.spacer
         self.inputlabelFontSize.place(x=self.Xposition, y=self.Yposition, width=self.widthButton,
                                       height=self.heightWidgets)
 
         self.labelSubmit = Button(self.frame, text="submit")
         self.labelSubmit['font'] = self.fontGet
-        self.Xposition = self.Xposition + self.widthButton + 10
+        self.Xposition = self.Xposition + self.widthButton + self.spacer
         self.labelSubmit.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
 
         getCurrentX = self.Xposition
@@ -628,7 +629,7 @@ class showGlobalConfigFrame:
 
     def OSfontThicckness(self):
         self.Xposition = 0
-        self.Yposition = self.Yposition + self.heightWidgets + 10
+        self.Yposition = self.Yposition + self.heightWidgets + self.spacer
 
         colorModeLabel = Label(self.frame, text="Text thickness: ")
         colorModeLabel['font'] = self.fontGet
@@ -641,7 +642,7 @@ class showGlobalConfigFrame:
                                                             "fontThickness", self.thicknessVar.get()),
                                          self.changedColor(boldButton)]
         boldButton['font'] = self.fontGet
-        self.Xposition = self.Xposition + self.widthLabel + 10
+        self.Xposition = self.Xposition + self.widthLabel + self.spacer
         boldButton.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
         # dark mode
         slimButton = Radiobutton(self.frame, text="slim", variable=self.thicknessVar, value="")
@@ -649,7 +650,7 @@ class showGlobalConfigFrame:
                                                             self.thicknessVar.get()),
                                          self.changedColor(slimButton)]
         slimButton['font'] = self.fontGet
-        self.Xposition = self.Xposition + self.widthButton + 10
+        self.Xposition = self.Xposition + self.widthButton + self.spacer
         slimButton.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
 
     """
@@ -660,11 +661,28 @@ class showGlobalConfigFrame:
 
     def OSfontFamily(self):
         self.Xposition = 0
-        self.Yposition = self.Yposition + self.heightWidgets + 10
+        self.Yposition = self.Yposition + self.heightWidgets + self.spacer
 
         colorModeLabel = Label(self.frame, text="Font family: ")
         colorModeLabel['font'] = self.fontGet
         colorModeLabel.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel, height=self.heightWidgets)
+
+        self.inputFontFamily = Text(self.frame)
+        self.inputFontFamily['font'] = self.fontInputThing
+        defaultHexValue = ryuconf.readJsonConfig("GlobalConfiguration", "fontFamily")
+        self.inputFontFamily.insert(1.0, defaultHexValue)
+        self.Xposition = self.Xposition + self.widthLabel + self.spacer
+        self.inputFontFamily.place(x=self.Xposition, y=self.Yposition, width=self.widthLabel / 3, height=self.heightWidgets)
+
+        self.fontFamilySubmit = Button(self.frame, text="submit")
+        self.fontFamilySubmit['font'] = self.fontGet
+        self.Xposition = self.Xposition + (self.widthLabel / 3) + self.spacer
+        self.fontFamilySubmit.place(x=self.Xposition, y=self.Yposition, width=self.widthButton, height=self.heightWidgets)
+
+        getCurrentXforHex = self.Xposition
+        getCurrentYforHex = self.Yposition
+
+        self.fontFamilySubmit['command'] = lambda: print( "workey")
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -705,9 +723,9 @@ class showGlobalConfigFrame:
 
     def OSresetButton(self):
         self.Xposition = (self.width / 2) - ((self.width / 5) / 2)
-        self.Yposition = self.Yposition + self.heightWidgets + 10
+        self.Yposition = self.Yposition + self.heightWidgets + self.spacer
         restore = Button(self.frame, text="RESTORE TO DEFAULT SETTINGS")
-        restore.place(x=self.Xposition, y=self.Yposition, width=self.width / 5, height=self.heightWidgets)
+        restore.place(x=self.Xposition, y=self.Yposition, width=self.width / 5, height= self.heightWidgets - self.spacer)
         restore['command'] = lambda: [self.restoreColors(), self.resetActions()]
 
 
