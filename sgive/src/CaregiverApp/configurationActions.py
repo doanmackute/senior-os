@@ -29,8 +29,8 @@ def readJsonConfig(key, value):
 
 def readLog():
     path = temporaryGetPath()
-    if os.path.exists(path) and os.path.isfile(os.path.join(temporaryGetPath(), 'CaregiverAPP.log')):
-        file = open(os.path.join(path, 'CaregiverAPP.log'), "r")
+    if os.path.exists(path) and os.path.isfile(os.path.join(temporaryGetPath(), 'EXAMPLE.log')):
+        file = open(os.path.join(path, 'caregiver.log'), "r")
         return [file.read()]
     else:
         logging.critical('There is no CaregiverApp.log or sconf/ file present in system, exiting program now.')
@@ -68,7 +68,7 @@ def caregiverAppConfig(path):
             "colorMode": "Light",
             "soundDelay": 5,
             "alertColor": "#AAFF00",
-            "alertSoundLanguage": "english",
+            "alertSoundLanguage": "English",
             "fontSize": 36,
             "labelFontSize": 12,
             "fontThickness": "bold",
